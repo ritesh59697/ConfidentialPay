@@ -33,4 +33,4 @@ node_modules/
 *~
 
 # Typo / accidental directories
-{contracts/
+\{contracts/

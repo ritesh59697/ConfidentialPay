@@ -20,4 +20,9 @@ contract MockERC20 is ERC20 {
         // In this mock, we always succeed the confidential transfer call
         return true;
     }
+
+    // Fallback to match selector from low-level calls like confidentialTransferFrom(address,address,euint64)
+    fallback(bytes calldata) external returns (bytes memory) {
+        return abi.encode(true);
+    }
 }

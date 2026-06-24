@@ -1,14 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import * as hre from "hardhat";
 import { InvoiceVault } from "../typechain-types";
-
-/**
- * NOTE: Full FHE tests require the FHEVM mock environment.
- * Run: npx hardhat test (uses local mock — no real FHE compute)
- *
- * For encrypted type testing, the FHEVM hardhat plugin automatically
- * provides cleartext mock values during local tests.
- */
 
 describe("InvoiceVault", () => {
   let vault: InvoiceVault;
@@ -25,23 +18,27 @@ describe("InvoiceVault", () => {
 
     const InvoiceVault = await ethers.getContractFactory("InvoiceVault");
     vault = await InvoiceVault.deploy(mockCUSDT) as InvoiceVault;
+
+    await hre.fhevm.assertCoprocessorInitialized(vault, "InvoiceVault");
   });
 
   describe("createInvoice", () => {
     it("creates an invoice and emits InvoiceCreated", async () => {
-      // In FHEVM mock mode, encAmount is a plaintext value wrapped as einput
-      const encAmount = ethers.toBeHex(1000n, 32); // mock encrypted value
-      const inputProof = "0x";                       // mock proof
+      const { encAmount, inputProof } = await createEncryptedAmount(1000n, await vault.getAddress(), sender.address);
 
-      await expect(
-        vault.connect(sender).createInvoice(
-          recipient.address,
-          encAmount,
-          inputProof,
-          "ipfs://QmMockMetadata"
-        )
-      ).to.emit(vault, "InvoiceCreated")
-        .withArgs(0, sender.address, recipient.address, await getTimestamp());
+      const tx = await vault.connect(sender).createInvoice(
+        recipient.address,
+        encAmount,
+        inputProof,
+        "ipfs://QmMockMetadata"
+      );
+      const receipt = await tx.wait();
+      const block = await ethers.provider.getBlock(receipt!.blockNumber);
+      const timestamp = block!.timestamp;
+
+      await expect(tx)
+        .to.emit(vault, "InvoiceCreated")
+        .withArgs(0, sender.address, recipient.address, timestamp);
     });
 
     it("reverts when recipient is zero address", async () => {
@@ -69,8 +66,9 @@ describe("InvoiceVault", () => {
 
   describe("getInvoiceMeta", () => {
     it("returns correct metadata after creation", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(500n, await vault.getAddress(), sender.address);
       await vault.connect(sender).createInvoice(
-        recipient.address, ethers.toBeHex(500n, 32), "0x", "ipfs://QmTest"
+        recipient.address, encAmount, inputProof, "ipfs://QmTest"
       );
 
       const [id, s, r, uri, , status] = await vault.getInvoiceMeta(0);
@@ -84,8 +82,9 @@ describe("InvoiceVault", () => {
 
   describe("cancelInvoice", () => {
     it("allows sender to cancel a pending invoice", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(200n, await vault.getAddress(), sender.address);
       await vault.connect(sender).createInvoice(
-        recipient.address, ethers.toBeHex(200n, 32), "0x", "ipfs://x"
+        recipient.address, encAmount, inputProof, "ipfs://x"
       );
       await expect(vault.connect(sender).cancelInvoice(0))
         .to.emit(vault, "InvoiceCancelled").withArgs(0);
@@ -95,18 +94,51 @@ describe("InvoiceVault", () => {
     });
 
     it("reverts if stranger tries to cancel", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(200n, await vault.getAddress(), sender.address);
       await vault.connect(sender).createInvoice(
-        recipient.address, ethers.toBeHex(200n, 32), "0x", "ipfs://x"
+        recipient.address, encAmount, inputProof, "ipfs://x"
       );
       await expect(vault.connect(stranger).cancelInvoice(0))
         .to.be.revertedWithCustomError(vault, "NotAuthorized");
     });
   });
 
+  describe("payInvoice", () => {
+    it("allows recipient to pay a pending invoice", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(1500n, await vault.getAddress(), sender.address);
+      await vault.connect(sender).createInvoice(
+        recipient.address, encAmount, inputProof, "ipfs://invoice-to-pay"
+      );
+
+      const tx = await vault.connect(recipient).payInvoice(0);
+      const receipt = await tx.wait();
+      const block = await ethers.provider.getBlock(receipt!.blockNumber);
+      const timestamp = block!.timestamp;
+
+      await expect(tx)
+        .to.emit(vault, "InvoicePaid")
+        .withArgs(0, timestamp);
+
+      const [,,,,,status] = await vault.getInvoiceMeta(0);
+      expect(status).to.equal(1); // Paid
+    });
+
+    it("reverts when a stranger tries to pay", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(1500n, await vault.getAddress(), sender.address);
+      await vault.connect(sender).createInvoice(
+        recipient.address, encAmount, inputProof, "ipfs://invoice-to-pay"
+      );
+
+      await expect(vault.connect(stranger).payInvoice(0))
+        .to.be.revertedWithCustomError(vault, "NotAuthorized");
+    });
+  });
+
   describe("isInvoicePaid", () => {
     it("returns false for a new invoice", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(100n, await vault.getAddress(), sender.address);
       await vault.connect(sender).createInvoice(
-        recipient.address, ethers.toBeHex(100n, 32), "0x", "ipfs://y"
+        recipient.address, encAmount, inputProof, "ipfs://y"
       );
       expect(await vault.isInvoicePaid(0)).to.equal(false);
     });
@@ -114,11 +146,13 @@ describe("InvoiceVault", () => {
 
   describe("dashboard queries", () => {
     it("tracks sent and received invoice IDs", async () => {
+      const amount1 = await createEncryptedAmount(300n, await vault.getAddress(), sender.address);
       await vault.connect(sender).createInvoice(
-        recipient.address, ethers.toBeHex(300n, 32), "0x", "ipfs://a"
+        recipient.address, amount1.encAmount, amount1.inputProof, "ipfs://a"
       );
+      const amount2 = await createEncryptedAmount(400n, await vault.getAddress(), sender.address);
       await vault.connect(sender).createInvoice(
-        recipient.address, ethers.toBeHex(400n, 32), "0x", "ipfs://b"
+        recipient.address, amount2.encAmount, amount2.inputProof, "ipfs://b"
       );
 
       const sent = await vault.getSentInvoiceIds(sender.address);
@@ -132,7 +166,12 @@ describe("InvoiceVault", () => {
   });
 });
 
-async function getTimestamp() {
-  const block = await ethers.provider.getBlock("latest");
-  return block!.timestamp;
+async function createEncryptedAmount(value: number | bigint, contractAddress: string, userAddress: string) {
+  const input = hre.fhevm.createEncryptedInput(contractAddress, userAddress);
+  input.add64(value);
+  const encrypted = await input.encrypt();
+  return {
+    encAmount: encrypted.handles[0],
+    inputProof: encrypted.inputProof
+  };
 }

@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "fhevm/lib/TFHE.sol";
-import "fhevm/config/ZamaFHEVMConfig.sol";
-import "fhevm/gateway/GatewayCaller.sol";
+import { FHE, euint64, externalEuint64 } from "@fhevm/solidity/lib/FHE.sol";
+import { ZamaEthereumConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -13,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *         Only the sender and recipient can decrypt their own invoices.
  *         Payment settlement uses confidential ERC-7984 cUSDT transfers.
  */
-contract InvoiceVault is SepoliaZamaFHEVMConfig, GatewayCaller {
+contract InvoiceVault is ZamaEthereumConfig {
 
     // ─── Types ────────────────────────────────────────────────────────────
 
@@ -73,7 +72,7 @@ contract InvoiceVault is SepoliaZamaFHEVMConfig, GatewayCaller {
      */
     function createInvoice(
         address recipient,
-        einput encAmount,
+        externalEuint64 encAmount,
         bytes calldata inputProof,
         string calldata metadataURI
     ) external returns (uint256 id) {
@@ -82,12 +81,12 @@ contract InvoiceVault is SepoliaZamaFHEVMConfig, GatewayCaller {
 
         id = nextInvoiceId++;
 
-        euint64 amount = TFHE.asEuint64(encAmount, inputProof);
+        euint64 amount = FHE.fromExternal(encAmount, inputProof);
 
         // Grant both parties access to decrypt the amount via EIP-712
-        TFHE.allowTransient(amount, address(this));
-        TFHE.allow(amount, msg.sender);
-        TFHE.allow(amount, recipient);
+        FHE.allowTransient(amount, address(this));
+        FHE.allow(amount, msg.sender);
+        FHE.allow(amount, recipient);
 
         invoices[id] = Invoice({
             id: id,
