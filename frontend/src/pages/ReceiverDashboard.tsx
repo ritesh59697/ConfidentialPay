@@ -19,9 +19,9 @@ function PaymentProofBadge({ invoiceId }: { invoiceId: bigint }) {
   if (!isPaid) return null;
 
   return (
-    <div className="flex items-start gap-3 border-[2px] border-black bg-zinc-955 p-3.5 shadow-[2px_2px_0px_0px_#4ade80] text-emerald-400 text-xs">
-      <ShieldCheck size={16} className="text-emerald-400 flex-shrink-0" />
-      <span className="leading-normal font-medium">
+    <div className="flex items-start gap-3 border-[2px] border-black dark:border-white bg-[#f4f2ec] dark:bg-[#121620] p-3.5 shadow-[2px_2px_0px_0px_#4ade80] text-emerald-700 dark:text-emerald-400 text-xs font-semibold leading-normal">
+      <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+      <span className="leading-normal font-semibold">
         <strong>Verified On-Chain:</strong> Invoice #{invoiceId.toString()} has been settled in full. 
         Calculations occurred homomorphically, keeping amounts confidential.
       </span>
@@ -59,7 +59,7 @@ function ReceivedInvoiceCard({
     }
   }, [status, invoiceId, onStatusLoaded]);
 
-  if (!meta) return <div className="h-40 bg-zinc-900 border-[3px] border-black animate-pulse shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />;
+  if (!meta) return <div className="h-40 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white animate-pulse shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]" />;
 
   const [id, sender, , metadataURI, createdAt] = meta;
 
@@ -111,22 +111,22 @@ function ReceivedInvoiceCard({
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className={`bg-zinc-900 border-[3px] border-black p-5 space-y-4 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${
-      isPaid ? "shadow-[4px_4px_0px_0px_#4ade80]" : isCancelled ? "opacity-60" : ""
+    <div className={`bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white p-5 space-y-4 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] ${
+      isPaid ? "shadow-[4px_4px_0px_0px_#4ade80] dark:shadow-[4px_4px_0px_0px_#22c55e]" : isCancelled ? "opacity-60" : ""
     }`}>
       {/* Header Info */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 border-[3px] border-black bg-zinc-950 flex items-center justify-center text-indigo-400 flex-shrink-0 mt-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div className="w-10 h-10 border-[3px] border-black dark:border-white bg-[#f4f2ec] dark:bg-[#151821] flex items-center justify-center text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
             <ArrowDownLeft size={18} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-yellow-400 font-mono font-bold">#{id.toString()}</span>
-              <h4 className="font-black text-sm text-white uppercase tracking-wide truncate">{description}</h4>
+              <span className="text-xs text-red-600 dark:text-yellow-400 font-mono font-bold">#{id.toString()}</span>
+              <h4 className="font-black text-sm text-black dark:text-white uppercase tracking-wide truncate">{description}</h4>
             </div>
-            <p className="text-[10px] text-gray-400 font-mono mt-0.5">
-              From: <span className="text-gray-300 font-bold">{sender.slice(0, 6)}…{sender.slice(-4)}</span>
+            <p className="text-[10px] text-gray-600 dark:text-gray-400 font-mono mt-0.5">
+              From: <span className="text-zinc-800 dark:text-gray-300 font-bold">{sender.slice(0, 6)}…{sender.slice(-4)}</span>
               {" · "}{new Date(Number(createdAt) * 1000).toLocaleDateString()}
             </p>
           </div>
@@ -136,15 +136,15 @@ function ReceivedInvoiceCard({
         <div className="text-right">
           {decryptedAmount !== null ? (
             <div className="space-y-0.5">
-              <p className="text-lg font-black text-white font-mono tabular-nums select-all">
+              <p className="text-lg font-black text-black dark:text-white font-mono tabular-nums select-all">
                 ${(Number(decryptedAmount) / 1_000_000).toFixed(2)}
               </p>
-              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-mono font-bold uppercase">
+              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold uppercase">
                 <Sparkles size={9} /> Decrypted
               </span>
             </div>
           ) : (
-            <div className="flex items-center justify-end gap-1.5 px-2.5 py-1.5 bg-zinc-955 border-2 border-black text-pink-400 text-xxs font-mono font-bold uppercase select-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center justify-end gap-1.5 px-2.5 py-1.5 bg-[#f4f2ec] dark:bg-[#151821] border-2 border-black dark:border-white text-pink-600 dark:text-pink-400 text-xxs font-mono font-bold uppercase select-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
               <Lock size={11} />
               <span>Shielded</span>
             </div>
@@ -180,15 +180,15 @@ function ReceivedInvoiceCard({
 
         {/* Transaction confirmation link */}
         {txHash && (
-          <div className="bg-zinc-950 border-2 border-black p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <span className="text-[10px] text-green-400 font-bold uppercase flex items-center gap-1.5">
+          <div className="bg-[#f4f2ec] dark:bg-[#151821] border-2 border-black dark:border-white p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase flex items-center gap-1.5">
               <CheckCircle size={12} /> Invoice Paid
             </span>
             <a
               href={`https://sepolia.etherscan.io/tx/${txHash}`}
               target="_blank"
               rel="noreferrer"
-              className="text-xxs text-blue-400 hover:text-blue-300 font-mono block truncate max-w-[200px] underline decoration-1 decoration-blue-500"
+              className="text-xxs text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-mono block truncate max-w-[200px] underline decoration-1 decoration-blue-500"
             >
               Tx: {txHash.slice(0, 16)}…
             </a>
@@ -215,10 +215,10 @@ function StatsBanner({ statusMap }: { statusMap: Record<string, number> }) {
       {/* Stat 1 */}
       <div className="card-brutal-blue p-5 flex items-center justify-between">
         <div className="space-y-1">
-          <span className="block text-xxs text-gray-300 uppercase tracking-wider font-mono font-bold">Total Received</span>
-          <span className="block text-3xl font-black text-white tabular-nums">{total}</span>
+          <span className="block text-xxs text-gray-600 dark:text-gray-300 uppercase tracking-wider font-mono font-bold">Total Received</span>
+          <span className="block text-3xl font-black text-black dark:text-white tabular-nums">{total}</span>
         </div>
-        <div className="w-10 h-10 border-[3px] border-black bg-blue-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <div className="w-10 h-10 border-[3px] border-black dark:border-white bg-blue-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
           <FileText size={18} />
         </div>
       </div>
@@ -226,10 +226,10 @@ function StatsBanner({ statusMap }: { statusMap: Record<string, number> }) {
       {/* Stat 2 */}
       <div className="card-brutal-yellow p-5 flex items-center justify-between">
         <div className="space-y-1">
-          <span className="block text-xxs text-gray-300 uppercase tracking-wider font-mono font-bold">Awaiting Action</span>
-          <span className="block text-3xl font-black text-yellow-400 tabular-nums">{pending}</span>
+          <span className="block text-xxs text-gray-600 dark:text-gray-300 uppercase tracking-wider font-mono font-bold">Awaiting Action</span>
+          <span className="block text-3xl font-black text-yellow-600 dark:text-yellow-400 tabular-nums">{pending}</span>
         </div>
-        <div className="w-10 h-10 border-[3px] border-black bg-yellow-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <div className="w-10 h-10 border-[3px] border-black dark:border-white bg-yellow-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
           <Clock size={18} />
         </div>
       </div>
@@ -237,10 +237,10 @@ function StatsBanner({ statusMap }: { statusMap: Record<string, number> }) {
       {/* Stat 3 */}
       <div className="card-brutal-green p-5 flex items-center justify-between">
         <div className="space-y-1">
-          <span className="block text-xxs text-gray-300 uppercase tracking-wider font-mono font-bold">Total Settled</span>
-          <span className="block text-3xl font-black text-emerald-400 tabular-nums">{paid}</span>
+          <span className="block text-xxs text-gray-600 dark:text-gray-300 uppercase tracking-wider font-mono font-bold">Total Settled</span>
+          <span className="block text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{paid}</span>
         </div>
-        <div className="w-10 h-10 border-[3px] border-black bg-emerald-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <div className="w-10 h-10 border-[3px] border-black dark:border-white bg-emerald-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
           <CheckCircle size={18} />
         </div>
       </div>
@@ -282,13 +282,13 @@ export default function ReceiverDashboard() {
 
   if (!isConnected) {
     return (
-      <div className="border-4 border-black p-8 bg-zinc-900 shadow-[6px_6px_0px_0px_#f472b6] text-center max-w-md mx-auto space-y-5 py-12 mt-12">
-        <div className="w-14 h-14 border-[3px] border-black bg-pink-400 flex items-center justify-center text-black mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-4 border-black dark:border-white p-8 bg-white dark:bg-[#121620] shadow-[6px_6px_0px_0px_#f472b6] text-center max-w-md mx-auto space-y-5 py-12 mt-12 text-black dark:text-white">
+        <div className="w-14 h-14 border-[3px] border-black dark:border-white bg-pink-400 flex items-center justify-center text-black mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
           <Lock size={26} />
         </div>
         <div className="space-y-2">
-          <h2 className="text-lg font-black uppercase text-white tracking-wide">Dashboard Locked</h2>
-          <p className="text-xs text-gray-300 leading-relaxed font-medium">
+          <h2 className="text-lg font-black uppercase text-black dark:text-white tracking-wide">Dashboard Locked</h2>
+          <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
             To review or pay confidential incoming invoices, you must connect an Ethereum wallet to Sepolia.
           </p>
         </div>
@@ -297,11 +297,11 @@ export default function ReceiverDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 text-black dark:text-white">
       {/* Page Header */}
       <div className="space-y-1">
         <h1 className="text-xl md:text-2xl font-black uppercase tracking-wider">Received Invoices</h1>
-        <p className="text-xs text-gray-400 font-medium uppercase">
+        <p className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wide">
           Review, decrypt, and settle incoming invoices with confidential cUSDT.
         </p>
       </div>
@@ -310,9 +310,9 @@ export default function ReceiverDashboard() {
       <StatsBanner statusMap={statusMap} />
 
       {/* EIP-712 Callout Info */}
-      <div className="flex items-start gap-4 border-[3px] border-black bg-zinc-900 p-5 shadow-[4px_4px_0px_0px_#60a5fa]">
-        <ShieldCheck size={18} className="text-blue-400 mt-0.5 flex-shrink-0" />
-        <span className="text-xs text-gray-300 leading-relaxed font-medium">
+      <div className="flex items-start gap-4 border-[3px] border-black dark:border-white bg-[#f4f2ec] dark:bg-[#121620] p-5 shadow-[4px_4px_0px_0px_#60a5fa]">
+        <ShieldCheck size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+        <span className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
           <strong>Gated Decryption:</strong> To reveal private invoice amounts, you must sign an EIP-712 permit. Your wallet proves it holds ownership, allowing the relayer to securely return plaintext.
         </span>
       </div>
@@ -324,7 +324,7 @@ export default function ReceiverDashboard() {
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-36 bg-zinc-900 border-[3px] border-black animate-pulse shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
+              <div key={i} className="h-36 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white animate-pulse shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]" />
             ))}
           </div>
         ) : invoiceIds && invoiceIds.length > 0 ? (
@@ -338,13 +338,13 @@ export default function ReceiverDashboard() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 border-[3px] border-black bg-zinc-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-4 max-w-xl mx-auto">
-            <div className="w-12 h-12 border-[3px] border-black bg-zinc-950 flex items-center justify-center mx-auto text-gray-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div className="text-center py-16 border-[3px] border-black dark:border-white bg-white dark:bg-[#121620] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] space-y-4 max-w-xl mx-auto text-black dark:text-white">
+            <div className="w-12 h-12 border-[3px] border-black dark:border-white bg-[#f4f2ec] dark:bg-[#151821] flex items-center justify-center mx-auto text-gray-650 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
               <AlertCircle size={22} />
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-black uppercase text-white tracking-wide">No Invoices Received</p>
-              <p className="text-xs text-gray-400 max-w-xs mx-auto leading-relaxed font-medium">
+              <p className="text-sm font-black uppercase text-black dark:text-white tracking-wide">No Invoices Received</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 max-w-xs mx-auto leading-relaxed font-semibold">
                 No active confidential invoices have been sent to this wallet address yet.
               </p>
             </div>
