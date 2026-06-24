@@ -12,7 +12,7 @@ export default function LandingPage() {
   const triggerEncryptionSim = () => {
     if (encryptStep !== "idle") return;
     setEncryptStep("encrypting");
-    
+
     setTimeout(() => {
       const chars = "0123456789abcdef";
       let mockHash = "0x";
@@ -27,7 +27,7 @@ export default function LandingPage() {
   const triggerDecryptionSim = () => {
     if (encryptStep !== "encrypted") return;
     setEncryptStep("decrypting");
-    
+
     setTimeout(() => {
       setEncryptStep("decrypted");
     }, 1500);
@@ -63,7 +63,7 @@ export default function LandingPage() {
       <section className="relative max-w-4xl mx-auto px-4 pt-12 pb-16 text-center space-y-8">
         <div className="inline-flex items-center gap-2 bg-yellow-400 border-[3px] border-black dark:border-white px-4 py-1.5 text-xs font-black text-black uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]">
           <Shield size={14} className="text-black fill-black animate-pulse" />
-          <span>Zama FHEVM — Builder Track Season 3</span>
+          <span>Zama FHEVM - Builder Track Season 3</span>
         </div>
 
         <div className="border-4 border-black dark:border-white bg-white dark:bg-[#121620] p-8 shadow-[8px_8px_0px_0px_#000000] dark:shadow-[8px_8px_0px_0px_#ffffff]">
@@ -75,7 +75,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-zinc-800 dark:text-zinc-300 text-sm md:text-base max-w-2xl mx-auto font-black uppercase tracking-wide leading-relaxed mt-6">
-            On a public blockchain, every payment is exposed. ConfidentialPay uses Fully Homomorphic Encryption to secure amounts and payment histories—while maintaining public, verifiable proof-of-payment.
+            On a public blockchain, every payment is exposed. ConfidentialPay uses (FHE) Fully Homomorphic Encryption to secure amounts and payment histories while maintaining public, verifiable proof-of-payment
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-8">
@@ -335,9 +335,8 @@ export default function LandingPage() {
             return (
               <div
                 key={index}
-                className={`border-[3px] border-black dark:border-white bg-white dark:bg-[#121620] transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] ${
-                  isOpen ? "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] translate-x-[2px] translate-y-[2px]" : ""
-                }`}
+                className={`border-[3px] border-black dark:border-white bg-white dark:bg-[#121620] transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] ${isOpen ? "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] translate-x-[2px] translate-y-[2px]" : ""
+                  }`}
               >
                 <button
                   onClick={() => setActiveFaq(isOpen ? null : index)}
@@ -350,9 +349,8 @@ export default function LandingPage() {
                   />
                 </button>
                 <div
-                  className={`transition-all duration-150 ease-out overflow-hidden ${
-                    isOpen ? "max-h-[300px] border-t-[3px] border-black dark:border-white p-5 pt-4 bg-[#f4f2ec] dark:bg-[#151821]" : "max-h-0"
-                  }`}
+                  className={`transition-all duration-150 ease-out overflow-hidden ${isOpen ? "max-h-[300px] border-t-[3px] border-black dark:border-white p-5 pt-4 bg-[#f4f2ec] dark:bg-[#151821]" : "max-h-0"
+                    }`}
                 >
                   <p className="text-xs md:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
                     {faq.a}
