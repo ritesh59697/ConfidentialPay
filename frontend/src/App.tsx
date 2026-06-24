@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider }  from "wagmi";
 import { ZamaProvider }   from "@zama-fhe/react-sdk";
-import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import { wagmiConfig, zamaConfig } from "@/lib/zama";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -18,15 +18,14 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <ZamaProvider config={zamaConfig}>
           <RainbowKitProvider
-            theme={darkTheme({
-              accentColor: "#facc15", // yellow-400
-              accentColorForeground: "black",
+            theme={lightTheme({
+              accentColor: "#000000",
+              accentColorForeground: "white",
               borderRadius: "none",
-              overlayBlur: "none",
             })}
           >
             <BrowserRouter>
-              <div className="min-h-screen bg-[#0c0f16] text-white selection:bg-yellow-400 selection:text-black">
+              <div className="min-h-screen bg-[#e4e2db] text-black selection:bg-red-500 selection:text-white">
                 <Header />
                 <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
                   <Routes>
@@ -49,11 +48,11 @@ function Header() {
     `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black transition-all ${
       isActive
         ? "bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[-1px] translate-y-[-1px]"
-        : "bg-zinc-800 text-gray-300 hover:text-white hover:bg-zinc-700 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
+        : "bg-white text-black hover:bg-gray-100 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
     }`;
 
   return (
-    <header className="border-b-4 border-black bg-zinc-900 sticky top-0 z-50">
+    <header className="border-b-4 border-black bg-[#e4e2db] sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 md:gap-6">
           {/* Logo */}
@@ -61,7 +60,7 @@ function Header() {
             <div className="w-9 h-9 border-[3px] border-black bg-emerald-400 flex items-center justify-center text-xs font-black text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] group-hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
               CP
             </div>
-            <span className="font-black text-xs md:text-sm tracking-wide hidden sm:inline-block text-white uppercase group-hover:text-emerald-400 transition-colors">
+            <span className="font-black text-xs md:text-sm tracking-wide hidden sm:inline-block text-black uppercase group-hover:text-red-500 transition-colors">
               ConfidentialPay
             </span>
           </Link>
@@ -75,7 +74,7 @@ function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-zinc-800">
+          <div className="border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white">
             <ConnectButton showBalance={false} chainStatus="icon" />
           </div>
         </div>
