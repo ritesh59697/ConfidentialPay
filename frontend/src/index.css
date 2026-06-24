@@ -122,7 +122,8 @@
   transition: border-color 0.2s ease;
 }
 .dark .marker-circle::after {
-  border-color: #ffffff;
+  border-width: 1.5px;
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 /* Neo-Brutalist Zine Components - Cards */
@@ -146,8 +147,9 @@
 .dark .card-brutal-cyan,
 .dark .card-brutal-white {
   background-color: #121620;
-  border-color: #ffffff;
-  box-shadow: 5px 5px 0px 0px #ffffff;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 3px 3px 0px 0px rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
 
@@ -184,8 +186,9 @@
 .dark .btn-brutal-magenta,
 .dark .btn-brutal-cyan,
 .dark .btn-brutal-gray {
-  border-color: #ffffff;
-  box-shadow: 4px 4px 0px 0px #ffffff;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 2.5px 2.5px 0px 0px rgba(255, 255, 255, 0.12);
 }
 
 .btn-brutal-yellow { background-color: #facc15; color: #000000; }
@@ -218,7 +221,7 @@
 .dark .btn-brutal-magenta:hover:not(:disabled),
 .dark .btn-brutal-cyan:hover:not(:disabled),
 .dark .btn-brutal-gray:hover:not(:disabled) {
-  box-shadow: 6px 6px 0px 0px #ffffff;
+  box-shadow: 3.5px 3.5px 0px 0px rgba(255, 255, 255, 0.2);
 }
 
 .btn-brutal-yellow:active:not(:disabled),
@@ -237,7 +240,7 @@
 .dark .btn-brutal-magenta:active:not(:disabled),
 .dark .btn-brutal-cyan:active:not(:disabled),
 .dark .btn-brutal-gray:active:not(:disabled) {
-  box-shadow: 2px 2px 0px 0px #ffffff;
+  box-shadow: 1.5px 1.5px 0px 0px rgba(255, 255, 255, 0.12);
 }
 
 /* Badges */
@@ -260,7 +263,8 @@
 .dark .badge-brutal-blue,
 .dark .badge-brutal-magenta,
 .dark .badge-brutal-gray {
-  border-color: #ffffff;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .badge-brutal-yellow { background-color: #facc15; }
