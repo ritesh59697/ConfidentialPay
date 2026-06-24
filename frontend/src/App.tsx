@@ -15,35 +15,15 @@ import "@rainbow-me/rainbowkit/styles.css";
 const queryClient = new QueryClient();
 
 export default function App() {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
-  });
-
   useEffect(() => {
-    if (theme === "dark") {
-      document.body.classList.add("dark");
-    } else {
-      document.body.classList.remove("dark");
-    }
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    document.body.classList.remove("dark");
+  }, []);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-
-  const isDark = theme === "dark";
-  const activeRainbowTheme = isDark
-    ? darkTheme({
-        accentColor: "#ffffff",
-        accentColorForeground: "black",
-        borderRadius: "none",
-      })
-    : lightTheme({
-        accentColor: "#000000",
-        accentColorForeground: "white",
-        borderRadius: "none",
-      });
+  const activeRainbowTheme = lightTheme({
+    accentColor: "#000000",
+    accentColorForeground: "white",
+    borderRadius: "none",
+  });
 
   return (
     <WagmiProvider config={wagmiConfig}>
@@ -52,7 +32,7 @@ export default function App() {
           <RainbowKitProvider theme={activeRainbowTheme}>
             <BrowserRouter>
               <div className="min-h-screen bg-[#e4e2db] dark:bg-[#090a0f] text-black dark:text-white selection:bg-red-500 selection:text-white transition-colors duration-200">
-                <Header theme={theme} toggleTheme={toggleTheme} />
+                <Header />
                 <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
                   <Routes>
                     <Route path="/"         element={<LandingPage />} />
@@ -69,12 +49,7 @@ export default function App() {
   );
 }
 
-interface HeaderProps {
-  theme: string;
-  toggleTheme: () => void;
-}
-
-function Header({ theme, toggleTheme }: HeaderProps) {
+function Header() {
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all ${
       isActive
@@ -105,15 +80,6 @@ function Header({ theme, toggleTheme }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="w-9 h-9 border-[3px] border-black dark:border-[1px] dark:border-white/20 bg-white dark:bg-[#121620] text-black dark:text-white flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,0.2)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
-            title={`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
-          >
-            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
-
           <div className="border-[3px] border-black dark:border-[1px] dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] bg-white dark:bg-[#121620]">
             <ConnectButton showBalance={false} chainStatus="icon" />
           </div>
