@@ -8,7 +8,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import LandingPage       from "@/pages/LandingPage";
 import SenderDashboard   from "@/pages/SenderDashboard";
 import ReceiverDashboard from "@/pages/ReceiverDashboard";
-import { ShieldAlert } from "lucide-react";
 import "@rainbow-me/rainbowkit/styles.css";
 
 const queryClient = new QueryClient();
@@ -20,14 +19,14 @@ export default function App() {
         <ZamaProvider config={zamaConfig}>
           <RainbowKitProvider
             theme={darkTheme({
-              accentColor: "#2563eb", // blue-600
-              accentColorForeground: "white",
-              borderRadius: "medium",
-              overlayBlur: "small",
+              accentColor: "#facc15", // yellow-400
+              accentColorForeground: "black",
+              borderRadius: "none",
+              overlayBlur: "none",
             })}
           >
             <BrowserRouter>
-              <div className="min-h-screen bg-gray-950 text-white selection:bg-blue-600/30 selection:text-blue-300">
+              <div className="min-h-screen bg-[#0c0f16] text-white selection:bg-yellow-400 selection:text-black">
                 <Header />
                 <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
                   <Routes>
@@ -47,36 +46,38 @@ export default function App() {
 
 function Header() {
   const navClass = ({ isActive }: { isActive: boolean }) =>
-    `text-xs md:text-sm font-medium px-3.5 py-1.5 rounded-lg transition-all duration-200 ${
+    `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black transition-all ${
       isActive
-        ? "bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-[0_0_12px_rgba(59,130,246,0.1)]"
-        : "text-gray-400 border border-transparent hover:text-white hover:bg-gray-900/60"
+        ? "bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[-1px] translate-y-[-1px]"
+        : "bg-zinc-800 text-gray-300 hover:text-white hover:bg-zinc-700 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
     }`;
 
   return (
-    <header className="border-b border-gray-900 bg-gray-950/70 backdrop-blur-md sticky top-0 z-50 transition-all">
+    <header className="border-b-4 border-black bg-zinc-900 sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-6 md:gap-8">
+        <div className="flex items-center gap-4 md:gap-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-md shadow-blue-600/25 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 border-[3px] border-black bg-emerald-400 flex items-center justify-center text-xs font-black text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] group-hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
               CP
             </div>
-            <span className="font-semibold text-sm tracking-tight hidden sm:inline-block text-white group-hover:text-blue-400 transition-colors">
+            <span className="font-black text-xs md:text-sm tracking-wide hidden sm:inline-block text-white uppercase group-hover:text-emerald-400 transition-colors">
               ConfidentialPay
             </span>
           </Link>
 
           {/* Nav */}
-          <nav className="flex items-center gap-1 md:gap-1.5">
+          <nav className="flex items-center gap-1.5">
             <NavLink to="/"        className={navClass} end>Home</NavLink>
-            <NavLink to="/send"    className={navClass}>Send invoices</NavLink>
-            <NavLink to="/receive" className={navClass}>Receive & pay</NavLink>
+            <NavLink to="/send"    className={navClass}>Send</NavLink>
+            <NavLink to="/receive" className={navClass}>Receive</NavLink>
           </nav>
         </div>
 
         <div className="flex items-center gap-3">
-          <ConnectButton showBalance={false} chainStatus="icon" />
+          <div className="border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-zinc-800">
+            <ConnectButton showBalance={false} chainStatus="icon" />
+          </div>
         </div>
       </div>
     </header>

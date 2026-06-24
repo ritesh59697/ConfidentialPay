@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Lock, Unlock, ArrowRight, Shield, Activity, Zap, CheckCircle2, ChevronDown, Terminal, EyeOff, ShieldCheck } from "lucide-react";
+import { Lock, Unlock, ArrowRight, Shield, Zap, CheckCircle2, ChevronDown, Terminal, EyeOff, ShieldCheck } from "lucide-react";
 
 export default function LandingPage() {
   const [amountInput, setAmountInput] = useState("45,000");
@@ -59,174 +59,174 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen pt-4 overflow-hidden">
-      {/* Ambient gradient backdrops */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-blue-900/10 blur-[120px] animate-pulse-glow" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-900/10 blur-[120px] animate-pulse-glow" style={{ animationDelay: "-3s" }} />
-
       {/* Hero Section */}
-      <section className="relative max-w-5xl mx-auto px-4 pt-16 pb-20 text-center space-y-8">
-        <div className="inline-flex items-center gap-2 bg-blue-950/50 border border-blue-900/40 rounded-full px-3.5 py-1.5 text-xs text-blue-400 font-medium">
-          <Shield size={12} className="text-blue-500 animate-pulse" />
-          <span>Powered by Zama FHEVM — Builder Track Season 3</span>
+      <section className="relative max-w-4xl mx-auto px-4 pt-12 pb-16 text-center space-y-8">
+        <div className="inline-flex items-center gap-2 bg-yellow-400 border-[3px] border-black px-4 py-1.5 text-xs font-black text-black uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          <Shield size={14} className="text-black fill-black" />
+          <span>Zama FHEVM — Builder Track Season 3</span>
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.15] max-w-4xl mx-auto">
-          Private B2B Invoices & Payments <br />
-          <span className="text-shimmer">Fully Encrypted On-Chain</span>
-        </h1>
+        <div className="border-4 border-black bg-zinc-900 p-8 shadow-[8px_8px_0px_0px_#facc15]">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.15] max-w-3xl mx-auto uppercase">
+            Private B2B Invoices & Payments <br />
+            <span className="text-yellow-400 underline decoration-black decoration-wavy underline-offset-4">Fully Encrypted On-Chain</span>
+          </h1>
 
-        <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed">
-          On a public blockchain, every payment is exposed. ConfidentialPay uses Fully Homomorphic Encryption to secure amounts and payment histories—while maintaining public verifiable proof-of-payment.
-        </p>
+          <p className="text-gray-300 text-sm md:text-base max-w-2xl mx-auto font-medium leading-relaxed mt-6">
+            On a public blockchain, every payment is exposed. ConfidentialPay uses Fully Homomorphic Encryption to secure amounts and payment histories—while maintaining public, verifiable proof-of-payment.
+          </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-          <Link
-            to="/send"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-xl transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 hover:scale-[1.01]"
-          >
-            <span>Send Invoice</span>
-            <ArrowRight size={16} />
-          </Link>
-          <Link
-            to="/receive"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-200 font-medium px-6 py-3 rounded-xl transition-all hover:border-gray-700"
-          >
-            <span>Receive & Pay</span>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-8">
+            <Link
+              to="/send"
+              className="w-full sm:w-auto btn-brutal-yellow px-8 py-3.5 flex items-center justify-center gap-2 text-sm"
+            >
+              <span>Send Invoice</span>
+              <ArrowRight size={18} />
+            </Link>
+            <Link
+              to="/receive"
+              className="w-full sm:w-auto btn-brutal-cyan px-8 py-3.5 flex items-center justify-center gap-2 text-sm"
+            >
+              <span>Receive & Pay</span>
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Interactive FHE Encryption Simulator */}
-      <section className="max-w-5xl mx-auto px-4 pb-24">
-        <div className="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-5">
+      <section className="max-w-4xl mx-auto px-4 pb-20">
+        <div className="border-4 border-black bg-zinc-900 p-6 md:p-8 relative shadow-[8px_8px_0px_0px_#ffffff]">
+          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Terminal size={140} />
           </div>
 
           <div className="relative mb-8 text-center md:text-left max-w-xl">
-            <h2 className="text-xl md:text-2xl font-bold">Interactive FHE Flow Visualizer</h2>
-            <p className="text-gray-400 text-xs md:text-sm mt-1">
-              See what actually happens when you submit an invoice. Only FHE allows arithmetic on encrypted data.
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-wide">FHE Flow Visualizer</h2>
+            <p className="text-gray-400 text-xs md:text-sm font-medium mt-1 uppercase">
+              See how TFHE operates on-chain. Plaintext inputs are masked client-side.
             </p>
           </div>
 
           {/* Three-step visual columns */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
             {/* Column 1: Client Side Input */}
-            <div className="bg-gray-950/60 border border-gray-800/80 rounded-2xl p-5 space-y-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                <span>1. Client Browser (Plaintext)</span>
-              </div>
-              <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 space-y-3">
-                <div>
-                  <label className="block text-xxs text-gray-500 uppercase font-mono mb-1">Invoice Value</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                    <input
-                      type="text"
-                      value={amountInput}
-                      onChange={(e) => {
-                        if (encryptStep === "idle") setAmountInput(e.target.value);
-                      }}
-                      disabled={encryptStep !== "idle"}
-                      className="w-full bg-gray-950 border border-gray-800 rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-blue-500 disabled:opacity-75"
-                    />
-                  </div>
+            <div className="card-brutal-blue p-5 flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-xs font-black text-blue-400 uppercase tracking-wider">
+                  <span className="w-2.5 h-2.5 rounded-none bg-blue-400 border border-black" />
+                  <span>1. Browser Input</span>
                 </div>
-                <button
-                  onClick={triggerEncryptionSim}
-                  disabled={encryptStep !== "idle"}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-500 text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <Lock size={12} />
-                  <span>Encrypt & Submit</span>
-                </button>
+                <div className="bg-zinc-950 border-[3px] border-black p-4 space-y-3">
+                  <div>
+                    <label className="block text-xxs text-gray-400 uppercase font-mono font-bold mb-1">Invoice Value</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono font-bold">$</span>
+                      <input
+                        type="text"
+                        value={amountInput}
+                        onChange={(e) => {
+                          if (encryptStep === "idle") setAmountInput(e.target.value);
+                        }}
+                        disabled={encryptStep !== "idle"}
+                        className="w-full bg-zinc-900 border-[3px] border-black pl-7 pr-3 py-2 text-sm font-mono text-white font-bold focus:outline-none focus:bg-zinc-800 disabled:opacity-75"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={triggerEncryptionSim}
+                    disabled={encryptStep !== "idle"}
+                    className="w-full py-2.5 btn-brutal-blue text-xs flex items-center justify-center gap-1.5"
+                  >
+                    <Lock size={14} />
+                    <span>Encrypt & Send</span>
+                  </button>
+                </div>
               </div>
-              <p className="text-xxs text-gray-500 leading-relaxed font-light">
+              <p className="text-[10px] text-gray-400 leading-normal font-mono">
                 *The input amount is mathematically encrypted client-side using the TFHE public key before broadcast.
               </p>
             </div>
 
             {/* Column 2: On-Chain Ciphertext */}
-            <div className="bg-gray-950/60 border border-gray-800/80 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+            <div className="card-brutal-magenta p-5 flex flex-col justify-between space-y-4">
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs font-semibold text-purple-400 uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                  <span>2. Ethereum Node (Encrypted)</span>
+                <div className="flex items-center gap-2 text-xs font-black text-pink-400 uppercase tracking-wider">
+                  <span className="w-2.5 h-2.5 rounded-none bg-pink-400 border border-black" />
+                  <span>2. EVM Node View</span>
                 </div>
-                <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 font-mono space-y-2 relative min-h-[110px] flex flex-col justify-center">
+                <div className="bg-zinc-950 border-[3px] border-black p-4 font-mono space-y-2 min-h-[120px] flex flex-col justify-center">
                   {encryptStep === "idle" && (
-                    <div className="text-center text-xs text-gray-600">Awaiting submission...</div>
+                    <div className="text-center text-xs text-gray-500 font-bold uppercase">Awaiting input...</div>
                   )}
                   {encryptStep === "encrypting" && (
                     <div className="flex flex-col items-center gap-2 justify-center py-2">
-                      <div className="w-5 h-5 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
-                      <span className="text-[10px] text-purple-400 animate-pulse">Running TFHE.asEuint64()...</span>
+                      <div className="w-6 h-6 border-[3px] border-pink-400 border-t-transparent animate-spin" />
+                      <span className="text-[10px] text-pink-400 font-bold uppercase animate-pulse">Running TFHE.asEuint64()...</span>
                     </div>
                   )}
                   {(encryptStep === "encrypted" || encryptStep === "decrypting" || encryptStep === "decrypted") && (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xxs border-b border-gray-800 pb-1.5 mb-1.5">
-                        <span className="text-purple-400">euint64 ciphertext handle</span>
-                        <span className="text-green-500">Secure</span>
+                      <div className="flex items-center justify-between text-[10px] border-b-[2px] border-black pb-1.5 mb-1.5">
+                        <span className="text-pink-400 font-bold">euint64 handle</span>
+                        <span className="badge-brutal-magenta py-0.5 text-[8px]">Shielded</span>
                       </div>
-                      <div className="text-[11px] text-gray-400 break-all leading-normal select-all">
+                      <div className="text-[10px] text-gray-400 break-all leading-normal select-all">
                         {cipherText}
                       </div>
                     </div>
                   )}
                 </div>
               </div>
-              <p className="text-xxs text-gray-500 leading-relaxed font-light">
+              <p className="text-[10px] text-gray-400 leading-normal font-mono">
                 *Ethereum nodes only see this hash. All network calculations (e.g. payInvoice) happen homomorphically.
               </p>
             </div>
 
-            {/* Column 3: Decrypted Recipient view */}
-            <div className="bg-gray-950/60 border border-gray-800/80 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+            {/* Column 3: Decrypted view */}
+            <div className="card-brutal-green p-5 flex flex-col justify-between space-y-4">
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span>3. Recipient (Decrypted)</span>
+                <div className="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider">
+                  <span className="w-2.5 h-2.5 rounded-none bg-emerald-400 border border-black" />
+                  <span>3. Decrypted Recipient</span>
                 </div>
-                <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 flex flex-col justify-center min-h-[110px]">
+                <div className="bg-zinc-950 border-[3px] border-black p-4 flex flex-col justify-center min-h-[120px]">
                   {encryptStep === "idle" || encryptStep === "encrypting" ? (
-                    <div className="text-center text-xs text-gray-600">Awaiting encryption...</div>
+                    <div className="text-center text-xs text-gray-500 font-bold uppercase">Awaiting encryption...</div>
                   ) : encryptStep === "encrypted" ? (
                     <button
                       onClick={triggerDecryptionSim}
-                      className="w-full py-2 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                      className="w-full py-2.5 btn-brutal-green text-xs flex items-center justify-center gap-1.5"
                     >
-                      <Unlock size={12} />
-                      <span>Decrypt (Signs EIP-712)</span>
+                      <Unlock size={14} />
+                      <span>Decrypt</span>
                     </button>
                   ) : encryptStep === "decrypting" ? (
                     <div className="flex flex-col items-center gap-2 justify-center py-2">
-                      <div className="w-5 h-5 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-                      <span className="text-[10px] text-emerald-400 animate-pulse">Requesting decryption key...</span>
+                      <div className="w-6 h-6 border-[3px] border-emerald-400 border-t-transparent animate-spin" />
+                      <span className="text-[10px] text-emerald-400 font-bold uppercase animate-pulse">Permit signature...</span>
                     </div>
                   ) : (
                     <div className="text-center space-y-1">
-                      <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-950 text-emerald-400 mb-1 border border-emerald-500/20">
-                        <CheckCircle2 size={13} />
+                      <div className="inline-flex items-center justify-center w-7 h-7 rounded-none bg-emerald-950 text-emerald-400 mb-1 border-2 border-emerald-500">
+                        <CheckCircle2 size={16} />
                       </div>
-                      <div className="text-lg font-bold text-white tabular-nums">${amountInput} USDT</div>
-                      <div className="text-[10px] text-emerald-400 font-mono">Decrypted Successfully</div>
+                      <div className="text-lg font-black text-white tabular-nums">${amountInput} USDT</div>
+                      <div className="text-[9px] text-emerald-400 font-mono font-bold uppercase">Decrypted successfully</div>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="flex justify-between items-center gap-2">
-                <p className="text-xxs text-gray-500 leading-relaxed font-light">
-                  *Only sender and recipient wallets have ACL permission to decrypt.
+              <div className="flex justify-between items-center gap-2 font-mono">
+                <p className="text-[10px] text-gray-400 leading-normal">
+                  *Only keyholders decrypt via EIP-712.
                 </p>
                 {encryptStep === "decrypted" && (
                   <button
                     onClick={resetSimulation}
-                    className="text-xxs text-blue-400 hover:text-blue-300 font-medium whitespace-nowrap"
+                    className="text-xs text-blue-400 hover:text-blue-300 font-black uppercase underline decoration-2 decoration-blue-500"
                   >
-                    Reset Visualizer
+                    Reset
                   </button>
                 )}
               </div>
@@ -236,113 +236,123 @@ export default function LandingPage() {
       </section>
 
       {/* Core Pillars / Feature section */}
-      <section className="max-w-5xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-900/40 border border-gray-800/80 rounded-2xl p-6 space-y-3 glass-card-hover">
-          <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-            <EyeOff size={20} />
+      <section className="max-w-4xl mx-auto px-4 pb-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card-brutal-cyan p-6 space-y-3">
+          <div className="w-11 h-11 border-[3px] border-black bg-cyan-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <EyeOff size={22} />
           </div>
-          <h3 className="font-semibold text-lg text-white">Confidential Amounts</h3>
-          <p className="text-xs text-gray-400 leading-relaxed font-light">
+          <h3 className="font-black text-lg text-white uppercase tracking-wide">Confidential Amounts</h3>
+          <p className="text-xs text-gray-300 leading-relaxed font-medium">
             Invoice amounts, balances, and transfer sizes are fully hidden on the blockchain. Shielded arithmetic prevents public monitoring of business relations.
           </p>
         </div>
 
-        <div className="bg-gray-900/40 border border-gray-800/80 rounded-2xl p-6 space-y-3 glass-card-hover">
-          <div className="w-10 h-10 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-            <ShieldCheck size={20} />
+        <div className="card-brutal-magenta p-6 space-y-3">
+          <div className="w-11 h-11 border-[3px] border-black bg-pink-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <ShieldCheck size={22} />
           </div>
-          <h3 className="font-semibold text-lg text-white">Verifiable Proof of Payment</h3>
-          <p className="text-xs text-gray-400 leading-relaxed font-light">
+          <h3 className="font-black text-lg text-white uppercase tracking-wide">Verifiable Proof</h3>
+          <p className="text-xs text-gray-300 leading-relaxed font-medium">
             Need to prove an invoice was settled? Anyone can call the contract's `isInvoicePaid` function to check the boolean flag, proving settlement without disclosing costs.
           </p>
         </div>
 
-        <div className="bg-gray-900/40 border border-gray-800/80 rounded-2xl p-6 space-y-3 glass-card-hover">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <Zap size={20} />
+        <div className="card-brutal-yellow p-6 space-y-3">
+          <div className="w-11 h-11 border-[3px] border-black bg-yellow-400 flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <Zap size={22} />
           </div>
-          <h3 className="font-semibold text-lg text-white">Native On-Chain Settlement</h3>
-          <p className="text-xs text-gray-400 leading-relaxed font-light">
+          <h3 className="font-black text-lg text-white uppercase tracking-wide">Native Settlement</h3>
+          <p className="text-xs text-gray-300 leading-relaxed font-medium">
             No complex trust parameters or off-chain state verification networks. Settlements occur inside Ethereum EVM transactions, executing securely on Sepolia testnet.
           </p>
         </div>
       </section>
 
       {/* Tech Architecture Step-by-Step */}
-      <section className="max-w-5xl mx-auto px-4 pb-24 space-y-8">
+      <section className="max-w-4xl mx-auto px-4 pb-20 space-y-8">
         <div className="text-center max-w-xl mx-auto space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">On-Chain Flow Architecture</h2>
-          <p className="text-sm text-gray-400 font-light">
-            How ConfidentialPay utilizes Zama's FHEVM protocol to manage end-to-end B2B invoices.
+          <h2 className="text-2xl font-black uppercase tracking-wider">Flow Architecture</h2>
+          <p className="text-sm text-gray-400 font-medium uppercase">
+            How ConfidentialPay utilizes Zama's FHEVM protocol to manage invoices.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Step 1 */}
-          <div className="bg-gray-900/20 border border-gray-800 rounded-xl p-5 space-y-2 relative">
-            <div className="text-xxs font-mono text-blue-500 font-semibold bg-blue-950/50 inline-block px-2 py-0.5 rounded-full mb-1">STEP 01</div>
-            <h4 className="font-semibold text-sm">Encrypt Client-Side</h4>
-            <p className="text-xxs text-gray-400 leading-relaxed font-light">
-              Sender fills recipient and amount. The Zama SDK encrypts the amount on-device using the network's public key.
-            </p>
+          <div className="border-[3px] border-black p-5 bg-zinc-900 shadow-[4px_4px_0px_0px_#60a5fa] relative flex flex-col justify-between min-h-[160px]">
+            <div className="badge-brutal-blue self-start">STEP 01</div>
+            <div className="mt-4">
+              <h4 className="font-black text-sm uppercase">Encrypt Local</h4>
+              <p className="text-[10px] text-gray-400 leading-normal font-medium mt-1">
+                Sender fills invoice. Zama SDK encrypts amount on-device using the network public key.
+              </p>
+            </div>
           </div>
 
           {/* Step 2 */}
-          <div className="bg-gray-900/20 border border-gray-800 rounded-xl p-5 space-y-2 relative">
-            <div className="text-xxs font-mono text-purple-500 font-semibold bg-purple-950/50 inline-block px-2 py-0.5 rounded-full mb-1">STEP 02</div>
-            <h4 className="font-semibold text-sm">On-Chain Storage</h4>
-            <p className="text-xxs text-gray-400 leading-relaxed font-light">
-              InvoiceVault contract registers the invoice details. The amount is saved as an encrypted TFHE `euint64` object.
-            </p>
+          <div className="border-[3px] border-black p-5 bg-zinc-900 shadow-[4px_4px_0px_0px_#f472b6] relative flex flex-col justify-between min-h-[160px]">
+            <div className="badge-brutal-magenta self-start">STEP 02</div>
+            <div className="mt-4">
+              <h4 className="font-black text-sm uppercase">On-Chain Save</h4>
+              <p className="text-[10px] text-gray-400 leading-normal font-medium mt-1">
+                InvoiceVault registers invoice. The value is stored securely as an encrypted FHE `euint64` handle.
+              </p>
+            </div>
           </div>
 
           {/* Step 3 */}
-          <div className="bg-gray-900/20 border border-gray-800 rounded-xl p-5 space-y-2 relative">
-            <div className="text-xxs font-mono text-emerald-500 font-semibold bg-emerald-950/50 inline-block px-2 py-0.5 rounded-full mb-1">STEP 03</div>
-            <h4 className="font-semibold text-sm">Encrypted Settlement</h4>
-            <p className="text-xxs text-gray-400 leading-relaxed font-light">
-              Recipient pays the invoice. cUSDT handles transfers homomorphically, deducting and adding encrypted funds.
-            </p>
+          <div className="border-[3px] border-black p-5 bg-zinc-900 shadow-[4px_4px_0px_0px_#4ade80] relative flex flex-col justify-between min-h-[160px]">
+            <div className="badge-brutal-green self-start">STEP 03</div>
+            <div className="mt-4">
+              <h4 className="font-black text-sm uppercase">FHE Transfer</h4>
+              <p className="text-[10px] text-gray-400 leading-normal font-medium mt-1">
+                Recipient pays. cUSDT handles transfers on-chain homomorphically, masking balances.
+              </p>
+            </div>
           </div>
 
           {/* Step 4 */}
-          <div className="bg-gray-900/20 border border-gray-800 rounded-xl p-5 space-y-2 relative">
-            <div className="text-xxs font-mono text-indigo-500 font-semibold bg-indigo-950/50 inline-block px-2 py-0.5 rounded-full mb-1">STEP 04</div>
-            <h4 className="font-semibold text-sm">Permitted Decrypt</h4>
-            <p className="text-xxs text-gray-400 leading-relaxed font-light">
-              Only authorized parties can request decryption via EIP-712 permits. Relayer returns cleartext only to them.
-            </p>
+          <div className="border-[3px] border-black p-5 bg-zinc-900 shadow-[4px_4px_0px_0px_#facc15] relative flex flex-col justify-between min-h-[160px]">
+            <div className="badge-brutal-yellow self-start">STEP 04</div>
+            <div className="mt-4">
+              <h4 className="font-black text-sm uppercase">Permit Decrypt</h4>
+              <p className="text-[10px] text-gray-400 leading-normal font-medium mt-1">
+                Only sender or recipient can generate EIP-712 permit to decrypt and view their invoice values.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* FAQ Accordions */}
-      <section className="max-w-3xl mx-auto px-4 pb-24 space-y-8">
-        <h2 className="text-2xl font-bold tracking-tight text-center">Frequently Asked Questions</h2>
+      <section className="max-w-2xl mx-auto px-4 pb-20 space-y-8">
+        <h2 className="text-2xl font-black uppercase tracking-wider text-center">Frequently Asked Questions</h2>
         <div className="space-y-4">
           {faqs.map((faq, index) => {
             const isOpen = activeFaq === index;
             return (
               <div
                 key={index}
-                className="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden transition-colors"
+                className={`border-[3px] border-black bg-zinc-900 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+                  isOpen ? "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[2px] translate-y-[2px]" : ""
+                }`}
               >
                 <button
                   onClick={() => setActiveFaq(isOpen ? null : index)}
-                  className="w-full flex items-center justify-between gap-4 p-5 text-left font-medium text-sm md:text-base text-gray-100 hover:text-white"
+                  className="w-full flex items-center justify-between gap-4 p-5 text-left font-black text-sm md:text-base text-white uppercase"
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
-                    size={16}
-                    className={`text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    size={18}
+                    className={`text-gray-400 transition-transform duration-150 ${isOpen ? "rotate-180 text-yellow-400" : ""}`}
                   />
                 </button>
                 <div
-                  className={`transition-all duration-200 ease-in-out ${
-                    isOpen ? "max-h-[300px] border-t border-gray-800/80 p-5 pt-4 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+                  className={`transition-all duration-150 ease-out overflow-hidden ${
+                    isOpen ? "max-h-[300px] border-t-3 border-black p-5 pt-4 bg-zinc-950" : "max-h-0"
                   }`}
                 >
-                  <p className="text-xs md:text-sm text-gray-400 leading-relaxed font-light">
+                  <p className="text-xs md:text-sm text-gray-300 leading-relaxed font-medium">
                     {faq.a}
                   </p>
                 </div>
