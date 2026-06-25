@@ -103,6 +103,29 @@ export const INVOICE_VAULT_ABI = [
   },
 ] as const;
 
+export const CUSDT_ABI = [
+  {
+    name: "setOperator",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "operator", type: "address" },
+      { name: "until", type: "uint48" },
+    ],
+    outputs: [],
+  },
+  {
+    name: "isOperator",
+    type: "function",
+    stateMutability: "view",
+    inputs: [
+      { name: "holder", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    outputs: [{ name: "", type: "bool" }],
+  },
+] as const;
+
 // ─── Invoice Status Helpers ───────────────────────────────────────────────────
 
 export const INVOICE_STATUS = {

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { useWriteContract, useReadContract, useAccount } from "wagmi";
+import { useWriteContract, useReadContract, useAccount, usePublicClient } from "wagmi";
 import { useZamaSDK } from "@zama-fhe/react-sdk";
-import { INVOICE_VAULT_ABI, INVOICE_VAULT_ADDRESS } from "@/lib/contracts";
+import { CUSDT_ABI, CUSDT_ADDRESS, INVOICE_VAULT_ABI, INVOICE_VAULT_ADDRESS } from "@/lib/contracts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -66,9 +66,35 @@ export function useCreateInvoice() {
 
 export function usePayInvoice() {
   const { writeContractAsync, isPending, error } = useWriteContract();
+  const { address } = useAccount();
+  const publicClient = usePublicClient();
 
   const payInvoice = useCallback(
     async (invoiceId: bigint) => {
+      if (!address) throw new Error("Wallet not connected");
+      if (!publicClient) throw new Error("Public client not ready");
+      if (CUSDT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+        throw new Error("cUSDT address is not configured");
+      }
+
+      const isOperator = await publicClient.readContract({
+        address: CUSDT_ADDRESS,
+        abi: CUSDT_ABI,
+        functionName: "isOperator",
+        args: [address, INVOICE_VAULT_ADDRESS],
+      });
+
+      if (!isOperator) {
+        const oneYearFromNow = Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60;
+        const approvalHash = await writeContractAsync({
+          address: CUSDT_ADDRESS,
+          abi: CUSDT_ABI,
+          functionName: "setOperator",
+          args: [INVOICE_VAULT_ADDRESS, oneYearFromNow],
+        });
+        await publicClient.waitForTransactionReceipt({ hash: approvalHash });
+      }
+
       const txHash = await writeContractAsync({
         address: INVOICE_VAULT_ADDRESS,
         abi: INVOICE_VAULT_ABI,
@@ -77,7 +103,7 @@ export function usePayInvoice() {
       });
       return txHash;
     },
-    [writeContractAsync]
+    [address, publicClient, writeContractAsync]
   );
 
   return { payInvoice, isPending, error };

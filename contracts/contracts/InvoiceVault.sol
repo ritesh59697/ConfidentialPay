@@ -3,7 +3,11 @@ pragma solidity ^0.8.24;
 
 import { FHE, euint64, externalEuint64 } from "@fhevm/solidity/lib/FHE.sol";
 import { ZamaEthereumConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+interface IERC7984 {
+    function isOperator(address holder, address spender) external view returns (bool);
+    function confidentialTransferFrom(address from, address to, euint64 amount) external returns (euint64 transferred);
+}
 
 /**
  * @title InvoiceVault
@@ -38,7 +42,7 @@ contract InvoiceVault is ZamaEthereumConfig {
     mapping(address => uint256[]) private receivedInvoices;
 
     // cUSDT wrapped token address (ERC-7984)
-    address public immutable cUSDT;
+    IERC7984 public immutable cUSDT;
 
     // ─── Events ───────────────────────────────────────────────────────────
 
@@ -52,13 +56,14 @@ contract InvoiceVault is ZamaEthereumConfig {
     error NotAuthorized();
     error InvoiceNotPending();
     error InvoiceNotFound();
+    error OperatorNotSet(address token);
     error ZeroAddress();
 
     // ─── Constructor ──────────────────────────────────────────────────────
 
     constructor(address _cUSDT) {
         if (_cUSDT == address(0)) revert ZeroAddress();
-        cUSDT = _cUSDT;
+        cUSDT = IERC7984(_cUSDT);
     }
 
     // ─── Core Functions ───────────────────────────────────────────────────
@@ -83,8 +88,8 @@ contract InvoiceVault is ZamaEthereumConfig {
 
         euint64 amount = FHE.fromExternal(encAmount, inputProof);
 
-        // Grant both parties access to decrypt the amount via EIP-712
-        FHE.allowTransient(amount, address(this));
+        // Grant the vault persistent access so it can later pass this handle to cUSDT.
+        FHE.allowThis(amount);
         FHE.allow(amount, msg.sender);
         FHE.allow(amount, recipient);
 
@@ -114,20 +119,12 @@ contract InvoiceVault is ZamaEthereumConfig {
 
         if (inv.status != InvoiceStatus.Pending) revert InvoiceNotPending();
         if (inv.recipient != msg.sender) revert NotAuthorized();
+        if (!cUSDT.isOperator(msg.sender, address(this))) revert OperatorNotSet(address(cUSDT));
+
+        FHE.allowTransient(inv.amount, address(cUSDT));
+        cUSDT.confidentialTransferFrom(msg.sender, inv.sender, inv.amount);
 
         inv.status = InvoiceStatus.Paid;
-
-        // Confidential ERC-7984 transfer: amount is never revealed on-chain
-        // The cUSDT contract handles FHE-encrypted transfer internally
-        bytes memory transferCall = abi.encodeWithSignature(
-            "confidentialTransferFrom(address,address,euint64)",
-            msg.sender,
-            inv.sender,
-            inv.amount
-        );
-        (bool success, ) = cUSDT.call(transferCall);
-        require(success, "Confidential transfer failed");
-
         emit InvoicePaid(invoiceId, block.timestamp);
     }
 

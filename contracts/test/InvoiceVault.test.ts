@@ -6,6 +6,7 @@ import { InvoiceVault } from "../typechain-types";
 describe("InvoiceVault", () => {
   let vault: InvoiceVault;
   let mockCUSDT: string;
+  let mock: any;
   let sender: any, recipient: any, stranger: any;
 
   beforeEach(async () => {
@@ -13,7 +14,7 @@ describe("InvoiceVault", () => {
 
     // Deploy a minimal ERC-20 mock as cUSDT stand-in for unit tests
     const MockToken = await ethers.getContractFactory("MockERC20");
-    const mock = await MockToken.deploy("Confidential USDT", "cUSDT");
+    mock = await MockToken.deploy("Confidential USDT", "cUSDT");
     mockCUSDT = await mock.getAddress();
 
     const InvoiceVault = await ethers.getContractFactory("InvoiceVault");
@@ -109,6 +110,7 @@ describe("InvoiceVault", () => {
       await vault.connect(sender).createInvoice(
         recipient.address, encAmount, inputProof, "ipfs://invoice-to-pay"
       );
+      await mock.connect(recipient).setOperator(await vault.getAddress(), Math.floor(Date.now() / 1000) + 3600);
 
       const tx = await vault.connect(recipient).payInvoice(0);
       const receipt = await tx.wait();
@@ -128,9 +130,20 @@ describe("InvoiceVault", () => {
       await vault.connect(sender).createInvoice(
         recipient.address, encAmount, inputProof, "ipfs://invoice-to-pay"
       );
+      await mock.connect(stranger).setOperator(await vault.getAddress(), Math.floor(Date.now() / 1000) + 3600);
 
       await expect(vault.connect(stranger).payInvoice(0))
         .to.be.revertedWithCustomError(vault, "NotAuthorized");
+    });
+
+    it("reverts when recipient has not approved the vault as operator", async () => {
+      const { encAmount, inputProof } = await createEncryptedAmount(1500n, await vault.getAddress(), sender.address);
+      await vault.connect(sender).createInvoice(
+        recipient.address, encAmount, inputProof, "ipfs://invoice-to-pay"
+      );
+
+      await expect(vault.connect(recipient).payInvoice(0))
+        .to.be.revertedWithCustomError(vault, "OperatorNotSet");
     });
   });
 

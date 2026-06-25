@@ -4,6 +4,8 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockERC20 is ERC20 {
+    mapping(address holder => mapping(address operator => uint48 until)) private _operators;
+
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
         _mint(msg.sender, 1000000 * 10**decimals());
     }
@@ -12,17 +14,20 @@ contract MockERC20 is ERC20 {
         _mint(to, amount);
     }
 
-    function confidentialTransferFrom(
-        address /* from */,
-        address /* to */,
-        uint256 /* encAmount */
-    ) external pure returns (bool) {
-        // In this mock, we always succeed the confidential transfer call
-        return true;
+    function setOperator(address operator, uint48 until) external {
+        _operators[msg.sender][operator] = until;
     }
 
-    // Fallback to match selector from low-level calls like confidentialTransferFrom(address,address,euint64)
-    fallback(bytes calldata) external returns (bytes memory) {
-        return abi.encode(true);
+    function isOperator(address holder, address operator) external view returns (bool) {
+        return uint256(_operators[holder][operator]) >= block.timestamp;
+    }
+
+    function confidentialTransferFrom(
+        address from,
+        address /* to */,
+        bytes32 encAmount
+    ) external view returns (bytes32) {
+        require(uint256(_operators[from][msg.sender]) >= block.timestamp, "Operator not set");
+        return encAmount;
     }
 }

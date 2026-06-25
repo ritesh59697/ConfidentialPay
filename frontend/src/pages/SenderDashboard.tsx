@@ -10,10 +10,12 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
   const [amount, setAmount]           = useState("");
   const [description, setDescription] = useState("");
   const [txHash, setTxHash]           = useState<string | null>(null);
+  const [error, setError]             = useState<string | null>(null);
   const { createInvoice, isPending }  = useCreateInvoice();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
 
     // Store description and timestamp inline as a data URI
     const metadataURI = `data:application/json,${encodeURIComponent(
@@ -29,8 +31,24 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
         metadataURI,
       });
       setTxHash(hash);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to create invoice:", err);
+      // Extract a user-friendly error message
+      let msg = "Transaction failed. Please try again.";
+      if (err instanceof Error) {
+        if (err.message.includes("User rejected") || err.message.includes("user rejected")) {
+          msg = "Transaction rejected in wallet.";
+        } else if (err.message.includes("FHE") || err.message.includes("encrypt")) {
+          msg = "FHE encryption failed. Make sure the Zama SDK is initialised and the network is Sepolia.";
+        } else if (err.message.includes("insufficient funds")) {
+          msg = "Insufficient ETH to pay gas fees.";
+        } else if (err.message.includes("network") || err.message.includes("RPC")) {
+          msg = "Network error. Check your RPC connection and try again.";
+        } else {
+          msg = err.message.length > 120 ? err.message.slice(0, 120) + "…" : err.message;
+        }
+      }
+      setError(msg);
     }
   }
 
@@ -100,7 +118,7 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
               type="text"
               placeholder="0x..."
               value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
+              onChange={(e) => { setRecipient(e.target.value); setError(null); }}
               required
               className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white px-3.5 py-2.5 text-sm font-mono text-black dark:text-white placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-bold"
             />
@@ -118,7 +136,7 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
                 step="0.01"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => { setAmount(e.target.value); setError(null); }}
                 required
                 className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white pl-8 pr-3.5 py-2.5 text-sm font-mono text-black dark:text-white placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-bold"
               />
@@ -144,6 +162,16 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
             </span>
           </div>
 
+          {/* Error display */}
+          {error && (
+            <div className="flex items-start gap-3 border-[3px] border-red-500 bg-red-50 dark:bg-red-950/30 p-4 shadow-[3px_3px_0px_0px_#ef4444]">
+              <AlertCircle size={16} className="mt-0.5 flex-shrink-0 text-red-600 dark:text-red-400" />
+              <span className="text-[11px] text-red-700 dark:text-red-400 leading-normal font-semibold break-all">
+                <strong>Error:</strong> {error}
+              </span>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex items-center gap-4 pt-2">
             <button
@@ -159,7 +187,7 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
               className="flex-1 py-2.5 btn-brutal-yellow text-xs flex items-center justify-center gap-2"
             >
               <Send size={12} />
-              <span>{isPending ? "Encrypting..." : "Send Invoice"}</span>
+              <span>{isPending ? "Encrypting & Sending…" : "Send Invoice"}</span>
             </button>
           </div>
         </form>
