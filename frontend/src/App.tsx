@@ -132,7 +132,17 @@ function Header() {
             className="md:hidden p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
+             {isOpen ? (
+               <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current" strokeWidth="2.5" strokeLinecap="square">
+                 <line x1="5" y1="5" x2="19" y2="19" />
+                 <line x1="5" y1="19" x2="19" y2="5" />
+               </svg>
+             ) : (
+               <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current" strokeWidth="2.5" strokeLinecap="square">
+                 <line x1="4" y1="8" x2="20" y2="8" />
+                 <line x1="4" y1="16" x2="20" y2="16" />
+               </svg>
+             )}
           </button>
         </div>
       </div>
