@@ -5,7 +5,7 @@ import { wagmiConfig } from "@/lib/wagmi";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import LandingPage       from "@/pages/LandingPage";
 import SenderDashboard   from "@/pages/SenderDashboard";
 import ReceiverDashboard from "@/pages/ReceiverDashboard";
@@ -64,6 +64,8 @@ export default function App() {
 }
 
 function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all ${
       isActive
@@ -71,12 +73,19 @@ function Header() {
         : "bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.12)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
     }`;
 
+  const mobileNavClass = ({ isActive }: { isActive: boolean }) =>
+    `block text-sm font-black uppercase px-4 py-3 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all text-center ${
+      isActive
+        ? "bg-yellow-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+        : "bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+    }`;
+
   return (
     <header className="border-b-4 border-black dark:border-b dark:border-white/15 bg-[#e4e2db] dark:bg-[#090a0f] sticky top-0 z-50 transition-colors duration-200">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 md:gap-6">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/" className="flex items-center gap-2.5 group" onClick={() => setIsOpen(false)}>
             <div className="w-9 h-9 border-[3px] border-black dark:border-[1px] dark:border-white/20 bg-[#EAB308] flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] group-hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:group-hover:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,0.2)] transition-all">
               <svg viewBox="0 0 100 100" className="w-6 h-6">
                 <path
@@ -103,8 +112,8 @@ function Header() {
             </span>
           </Link>
  
-          {/* Nav */}
-          <nav className="flex items-center gap-1.5">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-1.5">
             <NavLink to="/"        className={navClass} end>Home</NavLink>
             <NavLink to="/send"    className={navClass}>Send</NavLink>
             <NavLink to="/receive" className={navClass}>Receive</NavLink>
@@ -116,8 +125,29 @@ function Header() {
           <div className="border-[3px] border-black dark:border-[1px] dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] bg-white dark:bg-[#121620]">
             <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer Dropdown */}
+      {isOpen && (
+        <div className="md:hidden border-t-4 border-black dark:border-white/15 bg-[#f4f2ec] dark:bg-[#0d0e14] p-4 space-y-3 animate-in slide-in-from-top-4 duration-200">
+          <nav className="flex flex-col gap-2.5">
+            <NavLink to="/"        className={mobileNavClass} onClick={() => setIsOpen(false)} end>Home</NavLink>
+            <NavLink to="/send"    className={mobileNavClass} onClick={() => setIsOpen(false)}>Send</NavLink>
+            <NavLink to="/receive" className={mobileNavClass} onClick={() => setIsOpen(false)}>Receive</NavLink>
+            <NavLink to="/profile" className={mobileNavClass} onClick={() => setIsOpen(false)}>Profile</NavLink>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
