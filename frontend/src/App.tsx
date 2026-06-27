@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider }  from "wagmi";
-import { ZamaProvider }   from "@zama-fhe/react-sdk";
-import { RainbowKitProvider, lightTheme, darkTheme } from "@rainbow-me/rainbowkit";
+import { wagmiConfig } from "@/lib/wagmi";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
-import { wagmiConfig, zamaConfig } from "@/lib/zama";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Sun, Moon } from "lucide-react";
 import LandingPage       from "@/pages/LandingPage";
 import SenderDashboard   from "@/pages/SenderDashboard";
 import ReceiverDashboard from "@/pages/ReceiverDashboard";
+import ProfilePage       from "@/pages/ProfilePage";
 import "@rainbow-me/rainbowkit/styles.css";
 
 const queryClient = new QueryClient();
@@ -43,22 +43,21 @@ export default function App() {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ZamaProvider config={zamaConfig}>
-          <RainbowKitProvider theme={activeRainbowTheme} avatar={CustomAvatar}>
-            <BrowserRouter>
-              <div className="min-h-screen bg-[#e4e2db] dark:bg-[#090a0f] text-black dark:text-white selection:bg-red-500 selection:text-white transition-colors duration-200">
-                <Header />
-                <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
-                  <Routes>
-                    <Route path="/"         element={<LandingPage />} />
-                    <Route path="/send"     element={<SenderDashboard />} />
-                    <Route path="/receive"  element={<ReceiverDashboard />} />
-                  </Routes>
-                </main>
-              </div>
-            </BrowserRouter>
-          </RainbowKitProvider>
-        </ZamaProvider>
+        <RainbowKitProvider theme={activeRainbowTheme} avatar={CustomAvatar}>
+          <BrowserRouter>
+            <div className="min-h-screen bg-[#e4e2db] dark:bg-[#090a0f] text-black dark:text-white selection:bg-red-500 selection:text-white transition-colors duration-200">
+              <Header />
+              <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
+                <Routes>
+                  <Route path="/"         element={<LandingPage />} />
+                  <Route path="/send"     element={<SenderDashboard />} />
+                  <Route path="/receive"  element={<ReceiverDashboard />} />
+                  <Route path="/profile"  element={<ProfilePage />} />
+                </Routes>
+              </main>
+            </div>
+          </BrowserRouter>
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
@@ -109,6 +108,7 @@ function Header() {
             <NavLink to="/"        className={navClass} end>Home</NavLink>
             <NavLink to="/send"    className={navClass}>Send</NavLink>
             <NavLink to="/receive" className={navClass}>Receive</NavLink>
+            <NavLink to="/profile" className={navClass}>Profile</NavLink>
           </nav>
         </div>
 

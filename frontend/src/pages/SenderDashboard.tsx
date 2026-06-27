@@ -11,11 +11,13 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
   const [description, setDescription] = useState("");
   const [txHash, setTxHash]           = useState<string | null>(null);
   const [error, setError]             = useState<string | null>(null);
+  const [step, setStep]               = useState<0|1|2|3>(0);
   const { createInvoice, isPending }  = useCreateInvoice();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setStep(1);
 
     // Store description and timestamp inline as a data URI
     const metadataURI = `data:application/json,${encodeURIComponent(
@@ -25,13 +27,17 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
     const amountBigInt = BigInt(Math.round(parseFloat(amount) * 1_000_000)); // 6 decimals (USDT)
 
     try {
+      const t = setTimeout(() => setStep(2), 3000);
       const hash = await createInvoice({
         recipient: recipient as `0x${string}`,
         amount: amountBigInt,
         metadataURI,
       });
+      clearTimeout(t);
+      setStep(3);
       setTxHash(hash);
     } catch (err: unknown) {
+      setStep(0);
       console.error("Failed to create invoice:", err);
       // Extract a user-friendly error message
       let msg = "Transaction failed. Please try again.";
@@ -104,11 +110,51 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 border-[3px] border-black dark:border-white bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:active:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all"
+            disabled={isPending}
+            className="w-8 h-8 border-[3px] border-black dark:border-white bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:active:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <X size={16} />
           </button>
         </div>
+
+        {/* Progress steps — only while submitting */}
+        {step > 0 && (() => {
+          const STEPS = [
+            { label: "Encrypting amount with FHE", detail: "Generating zero-knowledge proof via Zama relayer…" },
+            { label: "Open your wallet",           detail: "A wallet popup just appeared — please approve the transaction." },
+            { label: "Broadcasting to Sepolia",    detail: "Sending the encrypted invoice to the network…" },
+          ];
+          return (
+            <div className="px-6 pt-5 pb-3 space-y-2 border-b-4 border-black dark:border-white bg-[#f9f7f1] dark:bg-[#0e1119]">
+              {STEPS.map((s, i) => {
+                const idx = i + 1, done = step > idx, active = step === idx;
+                return (
+                  <div key={i} className={`flex items-start gap-3 py-2 px-3 border-[2px] transition-all ${
+                    done ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30" :
+                    active ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/30 shadow-[3px_3px_0px_0px_#eab308]" :
+                    "border-gray-300 dark:border-zinc-700 opacity-40"
+                  }`}>
+                    <div className={`w-6 h-6 flex-shrink-0 flex items-center justify-center border-[2px] font-black text-[10px] mt-0.5 ${
+                      done ? "border-emerald-600 bg-emerald-400 text-black" :
+                      active ? "border-yellow-600 bg-yellow-400 text-black" :
+                      "border-gray-400 bg-gray-100 dark:bg-zinc-800 text-gray-500"
+                    }`}>{done ? <CheckCircle size={12}/> : idx}</div>
+                    <div className="min-w-0">
+                      <p className={`text-[11px] font-black uppercase tracking-wide ${
+                        done ? "text-emerald-700 dark:text-emerald-400" :
+                        active ? "text-yellow-700 dark:text-yellow-400" : "text-gray-500"
+                      }`}>
+                        {active && <span className="inline-block w-2 h-2 bg-yellow-500 rounded-full mr-1.5 animate-pulse"/>}
+                        {s.label}
+                      </p>
+                      {active && <p className="text-[10px] text-gray-600 dark:text-gray-400 font-semibold mt-0.5">{s.detail}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -120,7 +166,8 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
               value={recipient}
               onChange={(e) => { setRecipient(e.target.value); setError(null); }}
               required
-              className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white px-3.5 py-2.5 text-sm font-mono text-black dark:text-white placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-bold"
+              disabled={isPending}
+              className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white px-3.5 py-2.5 text-sm font-mono text-black dark:text-white placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-bold disabled:opacity-50"
             />
           </div>
 
@@ -138,7 +185,8 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
                 value={amount}
                 onChange={(e) => { setAmount(e.target.value); setError(null); }}
                 required
-                className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white pl-8 pr-3.5 py-2.5 text-sm font-mono text-black dark:text-white placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-bold"
+                disabled={isPending}
+                className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white pl-8 pr-3.5 py-2.5 text-sm font-mono text-black dark:text-white placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-bold disabled:opacity-50"
               />
             </div>
           </div>
@@ -150,7 +198,8 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-gray-500 resize-none focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-semibold"
+              disabled={isPending}
+              className="w-full bg-[#f4f2ec] dark:bg-[#151821] border-[3px] border-black dark:border-white px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-gray-500 resize-none focus:outline-none focus:bg-white dark:focus:bg-[#1d222e] transition-colors font-semibold disabled:opacity-50"
             />
           </div>
 
@@ -177,7 +226,8 @@ function CreateInvoiceForm({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 btn-brutal-gray text-xs"
+              disabled={isPending}
+              className="flex-1 py-2.5 btn-brutal-gray text-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
@@ -365,15 +415,17 @@ export default function SenderDashboard() {
 
   if (!isConnected) {
     return (
-      <div className="border-4 border-black dark:border-white p-8 bg-white dark:bg-[#121620] shadow-[6px_6px_0px_0px_#f472b6] text-center max-w-md mx-auto space-y-5 py-12 mt-12 text-black dark:text-white">
-        <div className="w-14 h-14 border-[3px] border-black dark:border-white bg-pink-400 flex items-center justify-center text-black mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
-          <Lock size={26} />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-lg font-black uppercase text-black dark:text-white tracking-wide">Dashboard Locked</h2>
-          <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
-            To view or create B2B invoices with Fully Homomorphic Encryption, you must connect an Ethereum wallet to Sepolia.
-          </p>
+      <div className="w-full flex justify-center py-12">
+        <div className="border-4 border-black dark:border-white p-8 bg-white dark:bg-[#121620] shadow-[6px_6px_0px_0px_#f472b6] text-center max-w-md w-full space-y-5 py-12 text-black dark:text-white">
+          <div className="w-14 h-14 border-[3px] border-black dark:border-white bg-pink-400 flex items-center justify-center text-black mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+            <Lock size={26} />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-lg font-black uppercase text-black dark:text-white tracking-wide">Dashboard Locked</h2>
+            <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
+              To view or create B2B invoices with Fully Homomorphic Encryption, you must connect an Ethereum wallet to Sepolia.
+            </p>
+          </div>
         </div>
       </div>
     );

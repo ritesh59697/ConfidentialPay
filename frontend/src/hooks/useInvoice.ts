@@ -1,7 +1,8 @@
 import { useCallback } from "react";
-import { useWriteContract, useReadContract, useAccount, usePublicClient } from "wagmi";
-import { useZamaSDK } from "@zama-fhe/react-sdk";
+import { useWriteContract, useReadContract, useAccount, usePublicClient, useSignTypedData } from "wagmi";
+import { bytesToHex } from "viem";
 import { CUSDT_ABI, CUSDT_ADDRESS, INVOICE_VAULT_ABI, INVOICE_VAULT_ADDRESS } from "@/lib/contracts";
+import { getFhevm, getDecryptionSession, userDecrypt } from "@/lib/fhevm";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,6 @@ export interface InvoiceMeta {
  */
 export function useCreateInvoice() {
   const { writeContractAsync, isPending, error } = useWriteContract();
-  const sdk = useZamaSDK();
   const { address } = useAccount();
 
   const createInvoice = useCallback(
@@ -38,15 +38,15 @@ export function useCreateInvoice() {
     }) => {
       if (!address) throw new Error("Wallet not connected");
 
-      // 1. Encrypt the amount client-side — never sent in plaintext
-      const { encryptedValues, inputProof } = await sdk.encrypt({
-        values: [{ value: amount, type: "euint64" }],
-        contractAddress: INVOICE_VAULT_ADDRESS,
-        userAddress: address,
-      });
-      const encAmount = encryptedValues[0]; // encrypted euint64 handle
+      // 1. Encrypt the amount client-side using relayer-sdk
+      const fhevm = await getFhevm();
+      const input = fhevm.createEncryptedInput(INVOICE_VAULT_ADDRESS, address);
+      input.add64(amount);
+      const encrypted = await input.encrypt();
+      const encAmount = bytesToHex(encrypted.handles[0]);
+      const inputProof = bytesToHex(encrypted.inputProof);
 
-      // 2. Submit the encrypted value to the contract
+      // 2. Submit the encrypted value and ZK input proof to the contract
       const txHash = await writeContractAsync({
         address: INVOICE_VAULT_ADDRESS,
         abi: INVOICE_VAULT_ABI,
@@ -56,7 +56,7 @@ export function useCreateInvoice() {
 
       return txHash;
     },
-    [sdk, address, writeContractAsync]
+    [address, writeContractAsync]
   );
 
   return { createInvoice, isPending, error };
@@ -148,24 +148,26 @@ export function useInvoiceMeta(invoiceId: bigint | undefined) {
  * locally. Only the wallet that holds ACL permission can do this.
  */
 export function useDecryptInvoiceAmount() {
-  const sdk = useZamaSDK();
+  const { signTypedDataAsync } = useSignTypedData();
+  const { address } = useAccount();
 
   const decryptAmount = useCallback(
     async (encryptedHandle: `0x${string}`) => {
-      // Before decrypting, check and grant EIP-712 permit for the contract
-      const hasPermit = await sdk.permits.hasPermit([INVOICE_VAULT_ADDRESS]);
-      if (!hasPermit) {
-        await sdk.permits.grantPermit([INVOICE_VAULT_ADDRESS]);
-      }
+      if (!address) throw new Error("Wallet not connected");
 
-      // Decrypt using the Zama SDK relayer query
-      const results = await sdk.decryption.decryptValues([
-        { encryptedValue: encryptedHandle, contractAddress: INVOICE_VAULT_ADDRESS },
-      ]);
-      const decrypted = results[encryptedHandle];
-      return BigInt(decrypted);
+      // 1. Get or create decryption session
+      const session = await getDecryptionSession(
+        "confidentialpay",
+        address,
+        [INVOICE_VAULT_ADDRESS],
+        signTypedDataAsync as any
+      );
+
+      // 2. Decrypt the amount using the session key
+      const amount = await userDecrypt(session, encryptedHandle, INVOICE_VAULT_ADDRESS);
+      return amount;
     },
-    [sdk]
+    [address, signTypedDataAsync]
   );
 
   return { decryptAmount };

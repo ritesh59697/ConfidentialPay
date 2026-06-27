@@ -8,8 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@zama-fhe/react-sdk": "^3.0.0",
-    "@zama-fhe/sdk": "^3.0.0",
+    "@zama-fhe/relayer-sdk": "0.4.1",
 
     "@tanstack/react-query": "^5.0.0",
     "viem": "^2.0.0",

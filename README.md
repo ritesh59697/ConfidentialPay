@@ -34,10 +34,10 @@ No zero-knowledge proof system, no TEE, no trusted oracle — just encrypted ari
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Frontend (React + @zama-fhe/react-sdk)                     │
+│  Frontend (React + @zama-fhe/relayer-sdk)                   │
 │  ┌──────────────┐  ┌─────────────────────────────────────┐  │
 │  │ Sender view  │  │ Receiver view                       │  │
-│  │ createInvoice│  │ decryptAmount (EIP-712)             │  │
+│  │ createInvoice│  │ decryptAmount (EIP-712 Decryption)  │  │
 │  │ cancelInvoice│  │ payInvoice → confidentialTransfer   │  │
 │  └──────────────┘  └─────────────────────────────────────┘  │
 └──────────────────────────┬──────────────────────────────────┘
@@ -65,7 +65,7 @@ No zero-knowledge proof system, no TEE, no trusted oracle — just encrypted ari
 | Smart contracts | Solidity 0.8.24 + FHEVM library |
 | FHE primitives | `euint64`, `TFHE.allow()`, `TFHE.asEuint64()` |
 | Frontend | React 18 + Vite + Tailwind CSS |
-| FHE SDK | `@zama-fhe/react-sdk` + `@zama-fhe/sdk` |
+| FHE SDK | `@zama-fhe/relayer-sdk` (v0.4.1) |
 | Wallet | wagmi v2 + RainbowKit + viem |
 | Network | Ethereum Sepolia testnet |
 | Deploy | Vercel |
@@ -146,8 +146,13 @@ struct Invoice {
 ### Client-side encryption (frontend)
 ```ts
 // Amount is encrypted on the user's device before submission
-const { handles, inputProof } = await token.encrypt64(amountBigInt);
-await writeContract({ functionName: "createInvoice", args: [recipient, handles[0], inputProof, uri] });
+const fhevm = await getFhevm();
+const input = fhevm.createEncryptedInput(INVOICE_VAULT_ADDRESS, userAddress);
+input.add64(amount);
+const encrypted = await input.encrypt();
+const encAmount = bytesToHex(encrypted.handles[0]);
+const inputProof = bytesToHex(encrypted.inputProof);
+await writeContract({ functionName: "createInvoice", args: [recipient, encAmount, inputProof, uri] });
 ```
 
 ### ACL-gated decryption
@@ -179,7 +184,8 @@ confidentialpay/
     ├── src/
     │   ├── lib/
     │   │   ├── contracts.ts         # ABI + addresses
-    │   │   └── zama.ts              # Zama SDK config
+    │   │   ├── fhevm.ts             # Zama SDK helpers & session decryption
+    │   │   └── wagmi.ts             # Wagmi & RainbowKit setup
     │   ├── hooks/
     │   │   └── useInvoice.ts        # All FHE + contract hooks
     │   ├── pages/

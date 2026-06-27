@@ -38,12 +38,14 @@ function ReceivedInvoiceCard({
   invoiceId: bigint;
   onStatusLoaded?: (id: string, status: number) => void;
 }) {
+  const { address } = useAccount();
   const { data: meta }                        = useInvoiceMeta(invoiceId);
   const { data: encHandle }                   = useReadContract({
     address: INVOICE_VAULT_ADDRESS,
     abi: INVOICE_VAULT_ABI,
     functionName: "getEncryptedAmount",
     args: [invoiceId],
+    account: address,
   });
   const { payInvoice, isPending: isPaying }   = usePayInvoice();
   const { decryptAmount }                     = useDecryptInvoiceAmount();
@@ -155,25 +157,35 @@ function ReceivedInvoiceCard({
       {/* Invoice Row Footer Actions */}
       <div className="flex flex-col gap-3">
         {isPending && !txHash && (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-col gap-2 pt-1">
             {decryptedAmount === null ? (
-              <button
-                onClick={handleDecrypt}
-                disabled={isDecrypting}
-                className="flex-1 py-2.5 btn-brutal-gray text-xs flex items-center justify-center gap-1.5"
-              >
-                <Unlock size={14} />
-                <span>{isDecrypting ? "Permit signature..." : "Reveal Amount"}</span>
-              </button>
+              <>
+                <button
+                  onClick={handleDecrypt}
+                  disabled={isDecrypting}
+                  className="flex-1 py-2.5 btn-brutal-gray text-xs flex items-center justify-center gap-1.5"
+                >
+                  <Unlock size={14} />
+                  <span>{isDecrypting ? "Permit signature..." : "Reveal Amount"}</span>
+                </button>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-mono text-center select-none">
+                  Note: Requires 1 free EIP-712 wallet signature to decrypt the amount securely.
+                </p>
+              </>
             ) : (
-              <button
-                onClick={handlePay}
-                disabled={isPaying}
-                className="flex-1 py-2.5 btn-brutal-yellow text-xs flex items-center justify-center gap-1.5"
-              >
-                <CheckCircle size={14} />
-                <span>{isPaying ? "Paying..." : `Pay $${(Number(decryptedAmount) / 1_000_000).toFixed(2)} USDT`}</span>
-              </button>
+              <>
+                <button
+                  onClick={handlePay}
+                  disabled={isPaying}
+                  className="flex-1 py-2.5 btn-brutal-yellow text-xs flex items-center justify-center gap-1.5"
+                >
+                  <CheckCircle size={14} />
+                  <span>{isPaying ? "Paying..." : `Pay $${(Number(decryptedAmount) / 1_000_000).toFixed(2)} USDT`}</span>
+                </button>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-mono text-center select-none leading-relaxed">
+                  Note: Settlement requires 2 transactions (1. Set cUSDT operator, 2. Submit payment).
+                </p>
+              </>
             )}
           </div>
         )}
@@ -282,15 +294,17 @@ export default function ReceiverDashboard() {
 
   if (!isConnected) {
     return (
-      <div className="border-4 border-black dark:border-white p-8 bg-white dark:bg-[#121620] shadow-[6px_6px_0px_0px_#f472b6] text-center max-w-md mx-auto space-y-5 py-12 mt-12 text-black dark:text-white">
-        <div className="w-14 h-14 border-[3px] border-black dark:border-white bg-pink-400 flex items-center justify-center text-black mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
-          <Lock size={26} />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-lg font-black uppercase text-black dark:text-white tracking-wide">Dashboard Locked</h2>
-          <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
-            To review or pay confidential incoming invoices, you must connect an Ethereum wallet to Sepolia.
-          </p>
+      <div className="w-full flex justify-center py-12">
+        <div className="border-4 border-black dark:border-white p-8 bg-white dark:bg-[#121620] shadow-[6px_6px_0px_0px_#f472b6] text-center max-w-md w-full space-y-5 py-12 text-black dark:text-white">
+          <div className="w-14 h-14 border-[3px] border-black dark:border-white bg-pink-400 flex items-center justify-center text-black mx-auto shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+            <Lock size={26} />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-lg font-black uppercase text-black dark:text-white tracking-wide">Dashboard Locked</h2>
+            <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
+              To review or pay confidential incoming invoices, you must connect an Ethereum wallet to Sepolia.
+            </p>
+          </div>
         </div>
       </div>
     );

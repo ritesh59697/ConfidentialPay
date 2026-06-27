@@ -7,6 +7,12 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
+  optimizeDeps: {
+    exclude: ["@zama-fhe/relayer-sdk"],
+  },
+  worker: {
+    format: "es",
+  },
   server: {
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
@@ -14,10 +20,11 @@ export default defineConfig({
     },
     proxy: {
       // Proxy /relayer/* to Zama's testnet relayer, bypassing CORS on localhost.
-      // The SDK's relayerUrl is set to `<origin>/relayer` so calls like /relayer/foo
-      // are forwarded to https://relayer.testnet.zama.org/v2/foo
+      // relayerUrl in zama.ts = "<origin>/relayer/v2"
+      // SDK uses the URL as-is (recognizes /v2 suffix as API version 2).
+      // Vite strips /relayer → /v2/some-api → https://relayer.testnet.zama.org/v2/some-api
       "/relayer": {
-        target: "https://relayer.testnet.zama.org/v2",
+        target: "https://relayer.testnet.zama.org",
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/relayer/, ""),
         secure: true,
