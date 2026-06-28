@@ -47,7 +47,7 @@ export default function ProfilePage() {
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-black uppercase tracking-tight text-black dark:text-white">Profile Locked</h2>
           <p className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-            Connect your MetaMask wallet to view your profile, confidential token balance, and full transaction history.
+            Connect your wallet to view your profile, confidential token balance, and full transaction history.
           </p>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function ProfilePage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-300">
       {/* ─── Profile Header Card ─── */}
       <div className="bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] flex flex-col md:flex-row items-center md:items-stretch gap-6 md:gap-8">
-        
+
         {/* Avatar block */}
         <div className="w-24 h-24 md:w-32 md:h-32 border-[3px] border-black dark:border-white bg-emerald-400 text-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
           <User size={64} className="stroke-[2.5]" />
@@ -147,21 +147,19 @@ export default function ProfilePage() {
         <div className="flex items-center gap-2 border-b-4 border-black dark:border-white pb-0.5">
           <button
             onClick={() => setActiveTab("received")}
-            className={`px-4 py-2.5 font-black text-xs md:text-sm uppercase tracking-wide border-t-4 border-x-4 border-black dark:border-white transition-all select-none ${
-              activeTab === "received"
+            className={`px-4 py-2.5 font-black text-xs md:text-sm uppercase tracking-wide border-t-4 border-x-4 border-black dark:border-white transition-all select-none ${activeTab === "received"
                 ? "bg-white dark:bg-[#121620] text-black dark:text-white translate-y-[4px]"
                 : "bg-gray-200 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700"
-            }`}
+              }`}
           >
             Received Ledger ({receivedIds.length})
           </button>
           <button
             onClick={() => setActiveTab("sent")}
-            className={`px-4 py-2.5 font-black text-xs md:text-sm uppercase tracking-wide border-t-4 border-x-4 border-black dark:border-white transition-all select-none ${
-              activeTab === "sent"
+            className={`px-4 py-2.5 font-black text-xs md:text-sm uppercase tracking-wide border-t-4 border-x-4 border-black dark:border-white transition-all select-none ${activeTab === "sent"
                 ? "bg-white dark:bg-[#121620] text-black dark:text-white translate-y-[4px]"
                 : "bg-gray-200 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-700"
-            }`}
+              }`}
           >
             Sent Ledger ({sentIds.length})
           </button>
@@ -261,9 +259,8 @@ function ProfileInvoiceCard({ invoiceId, type }: { invoiceId: bigint; type: "sen
     <div className="bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white p-5 space-y-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className={`w-9 h-9 border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] ${
-            type === "sent" ? "bg-red-400" : "bg-blue-400"
-          }`}>
+          <div className={`w-9 h-9 border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] ${type === "sent" ? "bg-red-400" : "bg-blue-400"
+            }`}>
             {type === "sent" ? <ArrowUpRight size={16} /> : <ArrowDownLeft size={16} />}
           </div>
           <div>
