@@ -107,7 +107,7 @@ function Header() {
                 <polygon points="48,58 46.5,68 53.5,68 52,58" fill="#0F0F0F" />
               </svg>
             </div>
-            <span className="font-black text-xs md:text-sm tracking-wide hidden sm:inline-block text-black dark:text-white uppercase group-hover:text-red-500 transition-colors">
+            <span className="font-black text-[10px] sm:text-xs md:text-sm tracking-wide inline-block text-black dark:text-white uppercase group-hover:text-red-500 transition-colors">
               ConfidentialPay
             </span>
           </Link>
