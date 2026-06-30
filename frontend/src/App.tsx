@@ -5,7 +5,7 @@ import { wagmiConfig } from "@/lib/wagmi";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Sun, Moon, Menu, X, Bell } from "lucide-react";
+import { Sun, Moon, Menu, X, Bell, ArrowUpRight, CheckCircle } from "lucide-react";
 import LandingPage       from "@/pages/LandingPage";
 import SenderDashboard   from "@/pages/SenderDashboard";
 import ReceiverDashboard from "@/pages/ReceiverDashboard";
@@ -67,6 +67,7 @@ export default function App() {
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const { data: receivedIds = [] } = useReceivedInvoiceIds();
 
   // Batch read invoice status details using useReadContracts to determine count of pending received invoices
@@ -83,6 +84,16 @@ function Header() {
   const pendingCount = (results as any)
     ? (results as any).filter((r: any) => r.status === "success" && r.result && Number(r.result[5]) === 0).length
     : 0;
+
+  const pendingInvoices = (results as any)
+    ? (results as any)
+        .map((r: any, idx: number) => ({
+          id: receivedIds[idx],
+          meta: r.result,
+          status: r.status,
+        }))
+        .filter((item: any) => item.status === "success" && item.meta && Number(item.meta[5]) === 0)
+    : [];
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all ${
@@ -141,19 +152,89 @@ function Header() {
 
         <div className="flex items-center gap-3">
           {/* Notification Bell */}
-          <Link
-            to="/receive"
-            className="relative p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,0.2)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
-            aria-label="View incoming invoices"
-            onClick={() => setIsOpen(false)}
-          >
-            <Bell size={18} className={pendingCount > 0 ? "animate-bounce" : ""} />
-            {pendingCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black dark:border-white animate-pulse">
-                {pendingCount}
-              </span>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowNotifications(!showNotifications);
+                setIsOpen(false);
+              }}
+              className="relative p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,0.2)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
+              aria-label="Toggle notifications dropdown"
+            >
+              <Bell size={18} className={pendingCount > 0 ? "animate-bounce" : ""} />
+              {pendingCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black dark:border-white animate-pulse">
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <>
+                {/* Invisible backdrop to dismiss when clicking outside */}
+                <div
+                  className="fixed inset-0 z-40 bg-transparent cursor-default"
+                  onClick={() => setShowNotifications(false)}
+                />
+                
+                {/* Popover Dropdown Card */}
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] z-50 p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="flex items-center justify-between border-b-2 border-black dark:border-white/10 pb-2">
+                    <span className="font-mono text-xs font-black uppercase text-black dark:text-white">
+                      Notifications ({pendingCount})
+                    </span>
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      className="hover:text-red-500 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+
+                  {pendingCount === 0 ? (
+                    <div className="py-5 text-center space-y-2 select-none">
+                      <div className="text-gray-400 dark:text-gray-600 flex justify-center">
+                        <CheckCircle size={32} className="stroke-[2.5]" />
+                      </div>
+                      <p className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 font-mono">
+                        All caught up!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                      {pendingInvoices.map((inv: any) => {
+                        const invId = inv.id.toString();
+                        const sender = inv.meta[1];
+                        const shortSender = `${sender.slice(0, 6)}...${sender.slice(-4)}`;
+                        return (
+                          <Link
+                            key={invId}
+                            to="/receive"
+                            onClick={() => setShowNotifications(false)}
+                            className="block p-2.5 border-2 border-black dark:border-white/10 bg-yellow-50 dark:bg-[#1a1e29] hover:bg-yellow-100 dark:hover:bg-[#222838] transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                          >
+                            <div className="flex items-start gap-2">
+                              <div className="p-1 bg-yellow-400 text-black border border-black rounded-sm flex-shrink-0 mt-0.5">
+                                <ArrowUpRight size={14} className="stroke-[2.5]" />
+                              </div>
+                              <div className="space-y-0.5">
+                                <p className="text-[11px] font-black uppercase text-black dark:text-white">
+                                  Invoice #{invId} Pending
+                                </p>
+                                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">
+                                  From: {shortSender}
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
             )}
-          </Link>
+          </div>
 
           <div className="border-[3px] border-black dark:border-[1px] dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] bg-white dark:bg-[#121620]">
             <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
