@@ -47,9 +47,9 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={activeRainbowTheme} avatar={CustomAvatar}>
           <BrowserRouter>
-            <div className="min-h-screen bg-[#e4e2db] dark:bg-[#090a0f] text-black dark:text-white selection:bg-red-500 selection:text-white transition-colors duration-200">
+            <div className="min-h-screen flex flex-col bg-[#e4e2db] dark:bg-[#090a0f] text-black dark:text-white selection:bg-red-500 selection:text-white transition-colors duration-200">
               <Header />
-              <main className="max-w-5xl mx-auto px-4 py-8 relative z-10">
+              <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8 relative z-10">
                 <Routes>
                   <Route path="/"         element={<LandingPage />} />
                   <Route path="/send"     element={<SenderDashboard />} />
@@ -57,6 +57,7 @@ export default function App() {
                   <Route path="/profile"  element={<ProfilePage />} />
                 </Routes>
               </main>
+              <Footer />
             </div>
           </BrowserRouter>
         </RainbowKitProvider>
@@ -273,5 +274,62 @@ function Header() {
         </div>
       )}
     </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="mt-auto border-t-4 border-black dark:border-white/15 bg-white dark:bg-[#121620] py-8 px-4 transition-colors duration-200">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* Left Side: Brand and Copyright */}
+        <div className="flex flex-col items-center md:items-start gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 border-2 border-black dark:border-white bg-[#EAB308] flex items-center justify-center shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+              <svg viewBox="0 0 100 100" className="w-4 h-4">
+                <path d="M50,15 L22,25 V52 C22,70 50,83 50,83 C50,83 78,70 78,52 V25 Z" fill="#0F0F0F" />
+                <path d="M39,48 V41 C39,34.5 44,30.5 50,30.5 C56,30.5 61,34.5 61,41 V48" fill="none" stroke="#EAB308" strokeWidth="5.5" strokeLinecap="round" />
+                <path d="M33,48 H67 V68 C67,71.5 64,74.5 60,74.5 H40 C36,74.5 33,71.5 33,68 Z" fill="#EAB308" />
+                <circle cx="50" cy="58" r="3.5" fill="#0F0F0F" />
+                <polygon points="48,58 46.5,68 53.5,68 52,58" fill="#0F0F0F" />
+              </svg>
+            </div>
+            <span className="font-black text-xs tracking-wider uppercase text-black dark:text-white">
+              ConfidentialPay
+            </span>
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 font-mono text-center md:text-left mt-1">
+            © {new Date().getFullYear()} ConfidentialPay. All rights reserved.
+          </p>
+        </div>
+
+        {/* Right Side: Links */}
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs font-bold">
+          <a
+            href="https://github.com/ritesh59697/ConfidentialPay.git"
+            target="_blank"
+            rel="noreferrer"
+            className="text-black dark:text-white hover:text-red-500 dark:hover:text-red-400 underline decoration-2 decoration-black dark:decoration-white/20 hover:decoration-red-500 transition-colors"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://docs.zama.ai/fhevm"
+            target="_blank"
+            rel="noreferrer"
+            className="text-black dark:text-white hover:text-red-500 dark:hover:text-red-400 underline decoration-2 decoration-black dark:decoration-white/20 hover:decoration-red-500 transition-colors"
+          >
+            Zama Docs
+          </a>
+          <a
+            href="https://sepolia.etherscan.io/address/0xB3Bfeee1cA3De9E736A742345C761947962Ca081"
+            target="_blank"
+            rel="noreferrer"
+            className="text-black dark:text-white hover:text-red-500 dark:hover:text-red-400 underline decoration-2 decoration-black dark:decoration-white/20 hover:decoration-red-500 transition-colors"
+          >
+            Contract (Sepolia)
+          </a>
+        </div>
+      </div>
+    </footer>
   );
 }
