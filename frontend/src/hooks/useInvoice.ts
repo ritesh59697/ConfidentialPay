@@ -3,6 +3,7 @@ import { useWriteContract, useReadContract, useAccount, usePublicClient, useSign
 import { bytesToHex } from "viem";
 import { CUSDT_ABI, CUSDT_ADDRESS, INVOICE_VAULT_ABI, INVOICE_VAULT_ADDRESS } from "@/lib/contracts";
 import { getFhevm, getDecryptionSession, userDecrypt } from "@/lib/fhevm";
+import { useQueryClient } from "@tanstack/react-query";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,6 +26,8 @@ export interface InvoiceMeta {
 export function useCreateInvoice() {
   const { writeContractAsync, isPending, error } = useWriteContract();
   const { address } = useAccount();
+  const publicClient = usePublicClient();
+  const queryClient = useQueryClient();
 
   const createInvoice = useCallback(
     async ({
@@ -54,9 +57,14 @@ export function useCreateInvoice() {
         args: [recipient, encAmount, inputProof, metadataURI],
       });
 
+      if (publicClient) {
+        await publicClient.waitForTransactionReceipt({ hash: txHash });
+      }
+      queryClient.invalidateQueries();
+
       return txHash;
     },
-    [address, writeContractAsync]
+    [address, publicClient, queryClient, writeContractAsync]
   );
 
   return { createInvoice, isPending, error };
@@ -68,6 +76,7 @@ export function usePayInvoice() {
   const { writeContractAsync, isPending, error } = useWriteContract();
   const { address } = useAccount();
   const publicClient = usePublicClient();
+  const queryClient = useQueryClient();
 
   const payInvoice = useCallback(
     async (invoiceId: bigint) => {
@@ -101,9 +110,13 @@ export function usePayInvoice() {
         functionName: "payInvoice",
         args: [invoiceId],
       });
+
+      await publicClient.waitForTransactionReceipt({ hash: txHash });
+      queryClient.invalidateQueries();
+
       return txHash;
     },
-    [address, publicClient, writeContractAsync]
+    [address, publicClient, queryClient, writeContractAsync]
   );
 
   return { payInvoice, isPending, error };
@@ -113,17 +126,26 @@ export function usePayInvoice() {
 
 export function useCancelInvoice() {
   const { writeContractAsync, isPending, error } = useWriteContract();
+  const publicClient = usePublicClient();
+  const queryClient = useQueryClient();
 
   const cancelInvoice = useCallback(
     async (invoiceId: bigint) => {
-      return writeContractAsync({
+      const txHash = await writeContractAsync({
         address: INVOICE_VAULT_ADDRESS,
         abi: INVOICE_VAULT_ABI,
         functionName: "cancelInvoice",
         args: [invoiceId],
       });
+
+      if (publicClient) {
+        await publicClient.waitForTransactionReceipt({ hash: txHash });
+      }
+      queryClient.invalidateQueries();
+
+      return txHash;
     },
-    [writeContractAsync]
+    [publicClient, queryClient, writeContractAsync]
   );
 
   return { cancelInvoice, isPending, error };
