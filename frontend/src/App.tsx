@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider }  from "wagmi";
+import { WagmiProvider, useReadContracts }  from "wagmi";
 import { wagmiConfig } from "@/lib/wagmi";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, Bell } from "lucide-react";
 import LandingPage       from "@/pages/LandingPage";
 import SenderDashboard   from "@/pages/SenderDashboard";
 import ReceiverDashboard from "@/pages/ReceiverDashboard";
 import ProfilePage       from "@/pages/ProfilePage";
+import { useReceivedInvoiceIds } from "@/hooks/useInvoice";
+import { INVOICE_VAULT_ADDRESS, INVOICE_VAULT_ABI } from "@/lib/contracts";
 import "@rainbow-me/rainbowkit/styles.css";
 
 const queryClient = new QueryClient();
@@ -65,6 +67,22 @@ export default function App() {
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: receivedIds = [] } = useReceivedInvoiceIds();
+
+  // Batch read invoice status details using useReadContracts to determine count of pending received invoices
+  const { data: results } = useReadContracts({
+    contracts: receivedIds.map((id) => ({
+      address: INVOICE_VAULT_ADDRESS,
+      abi: INVOICE_VAULT_ABI,
+      functionName: "getInvoiceMeta",
+      args: [id],
+    })),
+    query: { enabled: receivedIds.length > 0 },
+  });
+
+  const pendingCount = (results as any)
+    ? (results as any).filter((r: any) => r.status === "success" && r.result && Number(r.result[5]) === 0).length
+    : 0;
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all ${
@@ -122,6 +140,21 @@ function Header() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Notification Bell */}
+          <Link
+            to="/receive"
+            className="relative p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,0.2)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
+            aria-label="View incoming invoices"
+            onClick={() => setIsOpen(false)}
+          >
+            <Bell size={18} className={pendingCount > 0 ? "animate-bounce" : ""} />
+            {pendingCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black dark:border-white animate-pulse">
+                {pendingCount}
+              </span>
+            )}
+          </Link>
+
           <div className="border-[3px] border-black dark:border-[1px] dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] bg-white dark:bg-[#121620]">
             <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
           </div>
