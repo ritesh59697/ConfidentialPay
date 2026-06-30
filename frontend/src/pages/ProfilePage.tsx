@@ -55,7 +55,7 @@ export default function ProfilePage() {
   }
 
   const formattedBalance = balance
-    ? (Number(balance) / 1_000_000).toFixed(2)
+    ? (Number(balance) / 1e18).toFixed(2)
     : "0.00";
 
   return (
@@ -117,7 +117,7 @@ export default function ProfilePage() {
             <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-mono font-bold block">
               Confidential Balance
             </span>
-            <div className="flex items-baseline gap-2">
+            <div className="flex flex-wrap items-baseline gap-2 break-all">
               {isBalanceRevealed ? (
                 <span className="text-3xl font-black text-black dark:text-white font-mono tabular-nums animate-fade-in">
                   ${formattedBalance}
