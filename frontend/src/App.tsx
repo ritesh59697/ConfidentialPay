@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider, useReadContracts }  from "wagmi";
+import { WagmiProvider, useReadContracts } from "wagmi";
 import { wagmiConfig } from "@/lib/wagmi";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Sun, Moon, Menu, X, Bell, ArrowUpRight, CheckCircle } from "lucide-react";
-import LandingPage       from "@/pages/LandingPage";
-import SenderDashboard   from "@/pages/SenderDashboard";
+import { Sun, Moon, Menu, X, Bell, ArrowUpRight, CheckCircle, Heart } from "lucide-react";
+import LandingPage from "@/pages/LandingPage";
+import SenderDashboard from "@/pages/SenderDashboard";
 import ReceiverDashboard from "@/pages/ReceiverDashboard";
-import ProfilePage       from "@/pages/ProfilePage";
+import ProfilePage from "@/pages/ProfilePage";
 import { useReceivedInvoiceIds } from "@/hooks/useInvoice";
 import { INVOICE_VAULT_ADDRESS, INVOICE_VAULT_ABI } from "@/lib/contracts";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -51,10 +51,10 @@ export default function App() {
               <Header />
               <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8 relative z-10">
                 <Routes>
-                  <Route path="/"         element={<LandingPage />} />
-                  <Route path="/send"     element={<SenderDashboard />} />
-                  <Route path="/receive"  element={<ReceiverDashboard />} />
-                  <Route path="/profile"  element={<ProfilePage />} />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/send" element={<SenderDashboard />} />
+                  <Route path="/receive" element={<ReceiverDashboard />} />
+                  <Route path="/profile" element={<ProfilePage />} />
                 </Routes>
               </main>
               <Footer />
@@ -71,6 +71,16 @@ function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const { data: receivedIds = [] } = useReceivedInvoiceIds();
 
+  // Track seen notification IDs in localStorage
+  const [seenIds, setSeenIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("confidentialpay_seen_invoices");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   // Batch read invoice status details using useReadContracts to determine count of pending received invoices
   const { data: results } = useReadContracts({
     contracts: receivedIds.map((id) => ({
@@ -82,32 +92,55 @@ function Header() {
     query: { enabled: receivedIds.length > 0 },
   });
 
-  const pendingCount = (results as any)
-    ? (results as any).filter((r: any) => r.status === "success" && r.result && Number(r.result[5]) === 0).length
-    : 0;
-
   const pendingInvoices = (results as any)
     ? (results as any)
-        .map((r: any, idx: number) => ({
-          id: receivedIds[idx],
-          meta: r.result,
-          status: r.status,
-        }))
-        .filter((item: any) => item.status === "success" && item.meta && Number(item.meta[5]) === 0)
+      .map((r: any, idx: number) => ({
+        id: receivedIds[idx],
+        meta: r.result,
+        status: r.status,
+      }))
+      .filter((item: any) => item.status === "success" && item.meta && Number(item.meta[5]) === 0)
     : [];
 
+  const pendingCount = pendingInvoices.length;
+
+  // Unread count excludes invoice IDs that user has already viewed
+  const unreadCount = pendingInvoices.filter(
+    (inv: any) => !seenIds.includes(inv.id.toString())
+  ).length;
+
+  const markAllAsSeen = () => {
+    if (pendingInvoices.length > 0) {
+      const currentPendingStrIds = pendingInvoices.map((inv: any) => inv.id.toString());
+      const updated = Array.from(new Set([...seenIds, ...currentPendingStrIds]));
+      setSeenIds(updated);
+      try {
+        localStorage.setItem("confidentialpay_seen_invoices", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Failed to save seen invoices:", e);
+      }
+    }
+  };
+
+  const handleToggleNotifications = () => {
+    const nextState = !showNotifications;
+    setShowNotifications(nextState);
+    setIsOpen(false);
+    if (nextState) {
+      markAllAsSeen();
+    }
+  };
+
   const navClass = ({ isActive }: { isActive: boolean }) =>
-    `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all ${
-      isActive
-        ? "bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] translate-x-[-1px] translate-y-[-1px]"
-        : "bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.12)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
+    `text-xs md:text-sm font-black uppercase px-3.5 py-1.5 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all ${isActive
+      ? "bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] translate-x-[-1px] translate-y-[-1px]"
+      : "bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.12)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
     }`;
 
   const mobileNavClass = ({ isActive }: { isActive: boolean }) =>
-    `block text-sm font-black uppercase px-4 py-3 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all text-center ${
-      isActive
-        ? "bg-yellow-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-        : "bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+    `block text-sm font-black uppercase px-4 py-3 border-[3px] border-black dark:border-[1px] dark:border-white/20 transition-all text-center ${isActive
+      ? "bg-yellow-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+      : "bg-white dark:bg-[#121620] text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
     }`;
 
   return (
@@ -141,11 +174,11 @@ function Header() {
               ConfidentialPay
             </span>
           </Link>
- 
+
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1.5">
-            <NavLink to="/"        className={navClass} end>Home</NavLink>
-            <NavLink to="/send"    className={navClass}>Send</NavLink>
+            <NavLink to="/" className={navClass} end>Home</NavLink>
+            <NavLink to="/send" className={navClass}>Send</NavLink>
             <NavLink to="/receive" className={navClass}>Receive</NavLink>
             <NavLink to="/profile" className={navClass}>Profile</NavLink>
           </nav>
@@ -155,17 +188,14 @@ function Header() {
           {/* Notification Bell */}
           <div className="relative">
             <button
-              onClick={() => {
-                setShowNotifications(!showNotifications);
-                setIsOpen(false);
-              }}
+              onClick={handleToggleNotifications}
               className="relative p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,0.2)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
               aria-label="Toggle notifications dropdown"
             >
-              <Bell size={18} className={pendingCount > 0 ? "animate-bounce" : ""} />
-              {pendingCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black dark:border-white animate-pulse">
-                  {pendingCount}
+              <Bell size={18} className={unreadCount > 0 ? "text-yellow-500 dark:text-yellow-400" : ""} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black min-w-[20px] h-[20px] px-1 rounded-full flex items-center justify-center border-2 border-black dark:border-white shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] animate-pulse">
+                  {unreadCount}
                 </span>
               )}
             </button>
@@ -177,16 +207,20 @@ function Header() {
                   className="fixed inset-0 z-40 bg-transparent cursor-default"
                   onClick={() => setShowNotifications(false)}
                 />
-                
+
                 {/* Popover Dropdown Card */}
-                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] z-50 p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <div className="flex items-center justify-between border-b-2 border-black dark:border-white/10 pb-2">
-                    <span className="font-mono text-xs font-black uppercase text-black dark:text-white">
+                <div className="absolute right-0 mt-3 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] z-50 p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+                  {/* Caret Arrow */}
+                  <div className="absolute -top-[7px] right-3.5 w-3 h-3 bg-white dark:bg-[#121620] border-t-[3px] border-l-[3px] border-black dark:border-white rotate-45 z-10" />
+
+                  <div className="flex items-center justify-between border-b-2 border-black dark:border-white/10 pb-2 relative z-10">
+                    <span className="font-mono text-xs font-black uppercase text-black dark:text-white flex items-center gap-1.5">
+                      <Bell size={13} className="text-yellow-500" />
                       Notifications ({pendingCount})
                     </span>
                     <button
                       onClick={() => setShowNotifications(false)}
-                      className="hover:text-red-500 transition-colors"
+                      className="hover:text-red-500 transition-colors p-0.5"
                     >
                       <X size={14} />
                     </button>
@@ -194,7 +228,7 @@ function Header() {
 
                   {pendingCount === 0 ? (
                     <div className="py-5 text-center space-y-2 select-none">
-                      <div className="text-gray-400 dark:text-gray-600 flex justify-center">
+                      <div className="text-emerald-500 dark:text-emerald-400 flex justify-center">
                         <CheckCircle size={32} className="stroke-[2.5]" />
                       </div>
                       <p className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 font-mono">
@@ -247,17 +281,17 @@ function Header() {
             className="md:hidden p-2 bg-white dark:bg-[#121620] border-[3px] border-black dark:border-white/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center text-black dark:text-white"
             aria-label="Toggle menu"
           >
-             {isOpen ? (
-               <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current" strokeWidth="2.5" strokeLinecap="square">
-                 <line x1="5" y1="5" x2="19" y2="19" />
-                 <line x1="5" y1="19" x2="19" y2="5" />
-               </svg>
-             ) : (
-               <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current" strokeWidth="2.5" strokeLinecap="square">
-                 <line x1="4" y1="8" x2="20" y2="8" />
-                 <line x1="4" y1="16" x2="20" y2="16" />
-               </svg>
-             )}
+            {isOpen ? (
+              <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current" strokeWidth="2.5" strokeLinecap="square">
+                <line x1="5" y1="5" x2="19" y2="19" />
+                <line x1="5" y1="19" x2="19" y2="5" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current" strokeWidth="2.5" strokeLinecap="square">
+                <line x1="4" y1="8" x2="20" y2="8" />
+                <line x1="4" y1="16" x2="20" y2="16" />
+              </svg>
+            )}
           </button>
         </div>
       </div>
@@ -266,8 +300,8 @@ function Header() {
       {isOpen && (
         <div className="md:hidden border-t-4 border-black dark:border-white/15 bg-[#f4f2ec] dark:bg-[#0d0e14] p-4 space-y-3 animate-in slide-in-from-top-4 duration-200">
           <nav className="flex flex-col gap-2.5">
-            <NavLink to="/"        className={mobileNavClass} onClick={() => setIsOpen(false)} end>Home</NavLink>
-            <NavLink to="/send"    className={mobileNavClass} onClick={() => setIsOpen(false)}>Send</NavLink>
+            <NavLink to="/" className={mobileNavClass} onClick={() => setIsOpen(false)} end>Home</NavLink>
+            <NavLink to="/send" className={mobileNavClass} onClick={() => setIsOpen(false)}>Send</NavLink>
             <NavLink to="/receive" className={mobileNavClass} onClick={() => setIsOpen(false)}>Receive</NavLink>
             <NavLink to="/profile" className={mobileNavClass} onClick={() => setIsOpen(false)}>Profile</NavLink>
           </nav>
@@ -299,6 +333,19 @@ function Footer() {
           </div>
           <p className="text-[11px] text-gray-500 dark:text-gray-400 font-mono text-center md:text-left mt-1">
             © {new Date().getFullYear()} ConfidentialPay. All rights reserved.
+          </p>
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 font-mono text-center md:text-left mt-0.5 flex items-center gap-1.5 justify-center md:justify-start">
+            <span>Built with</span>
+            <Heart size={11} className="fill-red-500 text-red-500 animate-pulse" />
+            <span>by</span>
+            <a
+              href="https://x.com/ritesh5969"
+              target="_blank"
+              rel="noreferrer"
+              className="font-bold underline decoration-1 hover:text-red-500 hover:decoration-red-500 transition-colors"
+            >
+              ritesh
+            </a>
           </p>
         </div>
 
