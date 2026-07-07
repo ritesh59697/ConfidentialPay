@@ -4,6 +4,8 @@
 
 🎥 **[Watch the Demo Video](https://youtu.be/26_GY-OnnS8)**
 
+![ConfidentialPay Homepage](assets/homepage.png)
+
 On a public blockchain, every payment is visible to anyone. ConfidentialPay uses Zama's FHE protocol to keep invoice amounts, payment history, and business relationships **fully encrypted on-chain** — while still allowing parties to verify that invoices have been paid.
 
 ---
