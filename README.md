@@ -2,10 +2,13 @@
 
 > Private B2B invoice and payment system powered by Fully Homomorphic Encryption on Ethereum.
 
-🔗 **Quick Links:**
-- **Live Demo:** [confidential-pay.vercel.app](https://confidential-pay.vercel.app)
-- **GitHub:** [github.com/ritesh59697/ConfidentialPay](https://github.com/ritesh59697/ConfidentialPay)
-- **Demo Video:** [youtu.be/26_GY-OnnS8](https://youtu.be/26_GY-OnnS8)
+## Quick Demo
+
+| | |
+|---|---|
+| **Live Dashboard** | [https://confidential-pay.vercel.app](https://confidential-pay.vercel.app) |
+| **Deployed Contract** | [View on Sepolia Etherscan](https://sepolia.etherscan.io/address/0xB3Bfeee1cA3De9E736A742345C761947962Ca081) |
+| **Demo Video** | [Watch on YouTube](https://youtu.be/26_GY-OnnS8) |
 
 ![ConfidentialPay Homepage](assets/homepage.png)
 
