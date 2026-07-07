@@ -34,3 +34,6 @@ node_modules/
 
 # Typo / accidental directories
 \{contracts/
+
+# Public folder (contains large video assets)
+/frontend/public/

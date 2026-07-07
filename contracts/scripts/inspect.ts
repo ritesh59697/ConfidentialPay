@@ -8,6 +8,13 @@ async function main() {
   try {
     const cUSDT = await vault.cUSDT();
     console.log("  cUSDT address stored in contract:", cUSDT);
+    
+    // Check decimals of the token
+    const token = await ethers.getContractAt([
+      "function decimals() view returns (uint8)"
+    ], cUSDT);
+    const decimals = await token.decimals();
+    console.log("  cUSDT decimals:", decimals.toString());
   } catch (err: any) {
     console.log("  Failed to fetch cUSDT():", err.message);
   }
